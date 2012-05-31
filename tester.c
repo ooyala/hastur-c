@@ -11,6 +11,8 @@ int print_message(const char *message, void *user_data) {
 int main(int argc, char **argv) {
   hastur_deliver_with(print_message, NULL);
 
+  hastur_set_app_name(argv[0]);
+
   hastur_counter("my.counter", 7);
 
   return 0;
