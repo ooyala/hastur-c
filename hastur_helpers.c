@@ -1,5 +1,6 @@
 #include "hastur.h"
 #include "hastur_helpers.h"
+#include "hastur_stringbuilder.h"
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -14,76 +15,56 @@
 #define BUFLEN (64 * 1024)
 
 char buf[BUFLEN];
-char *buf_index = NULL;
-char *buf_end = buf + BUFLEN;
 char sub_buf[BUFLEN];  /* For formatting individual args */
 
-/*
- * A string builder.  Just using strncat repeatedly will iterate
- * through the whole built string each time, resulting in quadratic
- * total time.  By keeping a tail pointer into the buffer, this
- * function generates in linear time.
- */
-static void append_str(const char *str) {
-  int len = strlen(str);
 
-  if(buf_index >= buf_end) return;
+static void format_json_from_va_list(string_builder_t *builder, va_list argp) {
+  int first = 1;
 
-  strncpy(buf_index, str, buf_end - buf_index);
-  buf_index += len;
-}
-
-const char *__hastur_format_json(const char *message_type, ...) {
-  /* varargs list for label/type/value triples */
-  va_list argp;
   const char *label;
   int value_type;
   const char *value_str;
   int value_int;
   long value_long;
 
-  /* NUL-terminate and reset the buffer */
-  buf[0] = '\0';
-  buf_index = buf;
-
-  va_start(argp, message_type);
-
-  append_str("{\"type\":\"");
-  append_str(message_type);
-  append_str("\"");
-
   while(1) {
     label = va_arg(argp, const char *);
     if(!label) break;  /* When we hit a NULL, stop. */
 
-    append_str(",\"");
-    append_str(label);
-    append_str("\":");
+    if(first) {
+      first = 0; /* not first any more */
+    } else {
+      string_builder_append_char(builder, ',');
+    }
+
+    string_builder_append_char(builder, '\"');
+    string_builder_append(builder, label);
+    string_builder_append(builder, "\":");
 
     value_type = va_arg(argp, int);
     switch(value_type) {
     case HVALUE_STRING:
       value_str = va_arg(argp, const char *);
-      append_str("\"");
-      append_str(value_str);  /* TODO: escape quotes */
-      append_str("\"");
+      string_builder_append(builder, "\"");
+      string_builder_append(builder, value_str);  /* TODO: escape quotes */
+      string_builder_append(builder, "\"");
       break;
 
     case HVALUE_BARE:
       value_str = va_arg(argp, const char *);
-      append_str(value_str);
+      string_builder_append(builder, value_str);
       break;
 
     case HVALUE_INT:
       value_int = va_arg(argp, int);
       sprintf(sub_buf, "%d", value_int);
-      append_str(sub_buf);
+      string_builder_append(builder, sub_buf);
       break;
 
     case HVALUE_LONG:
       value_long = va_arg(argp, long);
       sprintf(sub_buf, "%ld", value_long);
-      append_str(sub_buf);
+      string_builder_append(builder, sub_buf);
       break;
 
     default:
@@ -91,8 +72,24 @@ const char *__hastur_format_json(const char *message_type, ...) {
       /* And continue... */
     }
   }
+}
 
-  append_str("}");
+const char *__hastur_format_json(const char *message_type, ...) {
+  /* varargs list for label/type/value triples */
+  va_list argp;
+  string_builder_t *builder;
+
+  builder = string_builder_new(buf, BUFLEN);
+
+  va_start(argp, message_type);
+
+  string_builder_append(builder, "{\"type\":\"");
+  string_builder_append(builder, message_type);
+  string_builder_append(builder, "\"");
+
+  format_json_from_va_list(builder, argp);
+
+  string_builder_append(builder, "}");
 
   va_end(argp);
 
