@@ -1,5 +1,8 @@
-What Is It?
------------
+README for Hastur
+-----------------
+
+What Is Hastur?
+---------------
 
 Hastur is a monitoring system written by Ooyala.  It uses Cassandra
 for time series storage, resulting in remarkable power, flexibility
