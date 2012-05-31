@@ -1,6 +1,6 @@
 # Let's just do this ghetto and rebuild every time.
 
-HASTUR_SOURCE=hastur.c hastur_helpers.c
+HASTUR_SOURCE=hastur.c hastur_helpers.c hastur_stringbuilder.c
 
 all: library tester
 
