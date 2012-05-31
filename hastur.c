@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "hastur.h"
 #include "hastur_helpers.h"
@@ -25,7 +26,7 @@ int hastur_counter(const char *name, int value) {
 				   "labels", HVALUE_STR, "{}",
 				   NULL);
 
-  return json ? hastur_send(json) : JSON_ERROR;
+  return json ? __hastur_send(json) : JSON_ERROR;
 }
 
 static int hastur_agent_port = 8150;

@@ -52,13 +52,13 @@ const char *__format_json(const char *message_type, ...) {
 
     case HVALUE_INT:
       value_int = va_arg(argp, int);
-      itoa(value_int, sub_buf, 10);
+      sprintf(sub_buf, "%d", value_int);
       strncat(buf, sub_buf, BUFLEN);
       break;
 
     case HVALUE_LONG:
       value_long = va_arg(argp, long);
-      ltoa(value_long, sub_buf, 10);
+      sprintf(sub_buf, "%ld", value_long);
       strncat(buf, sub_buf, BUFLEN);
       break;
 
@@ -83,9 +83,9 @@ static int send_error(const char *s)
   return -1;
 }
 
-int hastur_send(const char *message) {
+int __hastur_send(const char *message) {
   struct sockaddr_in si_other;
-  int s, i;
+  int s;
   deliver_with_type deliver_with;
   void *user_data;
 

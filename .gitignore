@@ -1,2 +1,4 @@
 *.o
 libhastur.a
+tester
+tester.dSYM
