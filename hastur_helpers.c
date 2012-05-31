@@ -147,7 +147,7 @@ char labels_buf[BUFLEN];
 const char *__default_labels(void) {
   int pid = getpid();
 
-  snprintf(labels_buf, BUFLEN, "{\"app\":\"%s\",\"pid\":%d,\"tid\":%s}",
+  snprintf(labels_buf, BUFLEN, "{\"app\":\"%s\",\"pid\":%d,\"tid\":\"%s\"}",
 	   hastur_get_app_name(), pid, __get_tid());
 
   return labels_buf;

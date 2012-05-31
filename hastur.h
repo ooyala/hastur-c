@@ -7,7 +7,7 @@ time_t hastur_timestamp(void);
 
 int hastur_counter(const char *name, int value);
 int hastur_counter_full(const char *name, int value, time_t timestamp, const char *labels);
-int hastur_counter_v(const char *name, int value, time_t timestampe, ...);
+int hastur_counter_v(const char *name, int value, time_t timestamp, ...);
 
 typedef int (*deliver_with_type)(const char *message, void *user_data);
 void hastur_deliver_with(deliver_with_type callback, void *user_data);

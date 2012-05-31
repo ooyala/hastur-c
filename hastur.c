@@ -23,10 +23,14 @@ int hastur_counter(const char *name, int value) {
 				   "name", HVALUE_STR, name,
 				   "value", HVALUE_INT, value,
 				   "timestamp", HVALUE_LONG, hastur_timestamp(),
-				   "labels", HVALUE_BARE, "{}",
+				   "labels", HVALUE_BARE, __default_labels(),
 				   NULL);
 
   return json ? __hastur_send(json) : JSON_ERROR;
+}
+
+int hastur_counter_v(const char *name, int value, time_t timestamp, ...) {
+  return 0;
 }
 
 static int hastur_agent_port = 8150;
