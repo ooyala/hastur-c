@@ -1,19 +1,22 @@
+#include "hastur.h"
 #include "hastur_helpers.h"
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <string.h>
 
 /* 64k is all that we can send (or more) for UDP datagrams */
 #define BUFLEN (64 * 1024)
 
-const char * format_json(const char *message_type, ...) {
-  char buf[BUFLEN];
-  char sub_buf[BUFLEN];  /* For formatting individual args */
+char buf[BUFLEN];
+char sub_buf[BUFLEN];  /* For formatting individual args */
 
+const char *__format_json(const char *message_type, ...) {
   /* varargs list for label/type/value triples */
   va_list argp;
   const char *label;
@@ -26,37 +29,37 @@ const char * format_json(const char *message_type, ...) {
   va_start(argp, message_type);
 
   /* TODO(noah): Add a string-builder for efficiency? */
-  strncat(buf, BUFLEN, "{\n\"type\":\"");
-  strncat(buf, BUFLEN, message_type);
-  strncat(buf, BUFLEN, "\"");
+  strncat(buf, "{\n\"type\":\"", BUFLEN);
+  strncat(buf, message_type, BUFLEN);
+  strncat(buf, "\"", BUFLEN);
 
   while(1) {
     label = va_arg(argp, const char *);
     if(!label) break;  /* When we hit a NULL, stop. */
 
-    strncat(buf, BUFLEN, "\"");
-    strncat(buf, BUFLEN, label);
-    strncat(buf, BUFLEN, "\":");
+    strncat(buf, "\"", BUFLEN);
+    strncat(buf, label, BUFLEN);
+    strncat(buf, "\":", BUFLEN);
 
     value_type = va_arg(argp, int);
     switch(value_type) {
     case HVALUE_STRING:
       value_str = va_arg(argp, const char *);
-      strncat(buf, BUFLEN, "\"");
-      strncat(buf, BUFLEN, value_str);  /* TODO: escape quotes */
-      strncat(buf, BUFLEN, "\"");
+      strncat(buf, "\"", BUFLEN);
+      strncat(buf, value_str, BUFLEN);  /* TODO: escape quotes */
+      strncat(buf, "\"", BUFLEN);
       break;
 
     case HVALUE_INT:
       value_int = va_arg(argp, int);
       itoa(value_int, sub_buf, 10);
-      strncat(buf, BUFLEN, subbuf);
+      strncat(buf, sub_buf, BUFLEN);
       break;
 
     case HVALUE_LONG:
       value_long = va_arg(argp, long);
       ltoa(value_long, sub_buf, 10);
-      strncat(buf, BUFLEN, subbuf);
+      strncat(buf, sub_buf, BUFLEN);
       break;
 
     default:
@@ -64,10 +67,10 @@ const char * format_json(const char *message_type, ...) {
       /* And continue... */
     }
 
-    strncat(buf, BUFLEN, ",")
+    strncat(buf, ",", BUFLEN);
   }
 
-  strncat(buf, BUFLEN, "\"c\": 1}");
+  strncat(buf, "\"c\": 1}", BUFLEN);
 
   va_end(argp);
 
@@ -106,7 +109,7 @@ int hastur_send(const char *message) {
     return send_error("inet_aton() failed");
   }
 
-  if (sendto(s, message, strlen(message), 0, &si_other, sizeof(si_other)) < 0) {
+  if (sendto(s, message, strlen(message), 0, (struct sockaddr*)&si_other, sizeof(si_other)) < 0) {
     return send_error("sendto()");
   }
 
