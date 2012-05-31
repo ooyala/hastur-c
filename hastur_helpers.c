@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <string.h>
 
-/* 64k is all that we can send (or more) for UDP datagrams */
+/* 64k is more than we can send in a single UDP datagram */
 #define BUFLEN (64 * 1024)
 
 char buf[BUFLEN];
@@ -43,25 +43,25 @@ static void format_json_from_va_list(string_builder_t *builder, va_list argp) {
 
     value_type = va_arg(argp, int);
     switch(value_type) {
-    case HVALUE_STRING:
+    case HASTUR_STRING:
       value_str = va_arg(argp, const char *);
       string_builder_append(builder, "\"");
       string_builder_append(builder, value_str);  /* TODO: escape quotes */
       string_builder_append(builder, "\"");
       break;
 
-    case HVALUE_BARE:
+    case HASTUR_BARE:
       value_str = va_arg(argp, const char *);
       string_builder_append(builder, value_str);
       break;
 
-    case HVALUE_INT:
+    case HASTUR_INT:
       value_int = va_arg(argp, int);
       sprintf(sub_buf, "%d", value_int);
       string_builder_append(builder, sub_buf);
       break;
 
-    case HVALUE_LONG:
+    case HASTUR_LONG:
       value_long = va_arg(argp, long);
       sprintf(sub_buf, "%ld", value_long);
       string_builder_append(builder, sub_buf);
@@ -157,6 +157,14 @@ const char *__hastur_default_labels(void) {
   return labels_buf;
 }
 
+char label_buf[BUFLEN];
+
 const char *__hastur_generate_labels(va_list argp) {
+  string_builder_t *builder;
+
+  builder = string_builder_new(label_buf, BUFLEN);
+
+  format_json_from_va_list(builder, argp);
+
   return "";
 }
