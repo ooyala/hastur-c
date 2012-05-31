@@ -33,7 +33,7 @@ static void append_str(const char *str) {
   buf_index += len;
 }
 
-const char *__format_json(const char *message_type, ...) {
+const char *__hastur_format_json(const char *message_type, ...) {
   /* varargs list for label/type/value triples */
   va_list argp;
   const char *label;
@@ -140,7 +140,7 @@ int __hastur_send(const char *message) {
   return 0;
 }
 
-static const char *__get_tid(void) {
+static const char *get_tid(void) {
   /* TODO: useful get_tid() */
   return "main";
 }
@@ -151,11 +151,15 @@ static const char *__get_tid(void) {
 
 char labels_buf[BUFLEN];
 
-const char *__default_labels(void) {
+const char *__hastur_default_labels(void) {
   int pid = getpid();
 
   snprintf(labels_buf, BUFLEN, "{\"app\":\"%s\",\"pid\":%d,\"tid\":\"%s\"}",
-	   hastur_get_app_name(), pid, __get_tid());
+	   hastur_get_app_name(), pid, get_tid());
 
   return labels_buf;
+}
+
+const char *__hastur_generate_labels(va_list argp) {
+  return "";
 }

@@ -1,9 +1,11 @@
 #ifndef __HASTUR_CLIENT_HELPERS__
 #define __HASTUR_CLIENT_HELPERS__
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdarg.h>
 
 /* Values passed to format_json */
 #define HVALUE_STRING   1
@@ -13,11 +15,11 @@ extern "C" {
 #define HVALUE_BARE     4
 
 int __hastur_send(const char *message);
-const char *__format_json(const char *message_type, ...);
-const char *__default_labels(void);
-const char *__generate_labels(va_list argp);
+const char *__hastur_format_json(const char *message_type, ...);
+const char *__hastur_default_labels(void);
+const char *__hastur_generate_labels(va_list argp);
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

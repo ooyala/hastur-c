@@ -1,7 +1,7 @@
 #ifndef __HASTUR_CLIENT__
 #define __HASTUR_CLIENT__
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -24,7 +24,7 @@ void hastur_set_agent_port(int port);
 const char* hastur_get_app_name(void);
 void hastur_set_app_name(const char *app_name);
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

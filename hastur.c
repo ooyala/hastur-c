@@ -19,18 +19,33 @@ time_t hastur_timestamp(void) {
 }
 
 int hastur_counter(const char *name, int value) {
-  const char *json = __format_json("counter",
-				   "name", HVALUE_STR, name,
-				   "value", HVALUE_INT, value,
-				   "timestamp", HVALUE_LONG, hastur_timestamp(),
-				   "labels", HVALUE_BARE, __default_labels(),
-				   NULL);
+  const char *json = __hastur_format_json("counter",
+					  "name", HVALUE_STR, name,
+					  "value", HVALUE_INT, value,
+					  "timestamp", HVALUE_LONG, hastur_timestamp(),
+					  "labels", HVALUE_BARE, __hastur_default_labels(),
+					  NULL);
 
   return json ? __hastur_send(json) : JSON_ERROR;
 }
 
 int hastur_counter_v(const char *name, int value, time_t timestamp, ...) {
-  return 0;
+  const char *json;
+  va_list argp;
+  const char *labels;
+
+  va_start(argp, timestamp);
+  labels = __hastur_generate_labels(argp);
+  va_end(argp);
+
+  json = __hastur_format_json("counter",
+			      "name", HVALUE_STR, name,
+			      "value", HVALUE_INT, value,
+			      "timestamp", HVALUE_LONG, hastur_timestamp(),
+			      "labels", HVALUE_BARE, labels,
+			      NULL);
+
+  return json ? __hastur_send(json) : JSON_ERROR;
 }
 
 static int hastur_agent_port = 8150;
