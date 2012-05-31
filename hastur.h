@@ -1,6 +1,10 @@
 #ifndef __HASTUR_CLIENT__
 #define __HASTUR_CLIENT__
 
+#ifndef __cplusplus
+extern "C" {
+#endif
+
 #include <time.h>
 
 time_t hastur_timestamp(void);
@@ -19,5 +23,9 @@ void hastur_set_agent_port(int port);
 
 const char* hastur_get_app_name(void);
 void hastur_set_app_name(const char *app_name);
+
+#ifndef __cplusplus
+}
+#endif
 
 #endif /* __HASTUR_CLIENT__ */
