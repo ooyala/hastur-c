@@ -26,5 +26,7 @@ int main(int argc, char **argv) {
 
   hastur_counter("my.counter", 7);
 
+  hastur_counter_v("labeled.counter", 1, HASTUR_NOW, "mylabel1", HASTUR_INT, 7, "mylabel2", HASTUR_STRING, "bobo", NULL);
+
   return 0;
 }
