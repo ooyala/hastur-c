@@ -1,4 +1,4 @@
-#include "hastur_stringbuilder.h"
+#include "hastur_string_builder.h"
 #include <stdlib.h>
 #include <string.h>
 

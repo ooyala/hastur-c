@@ -1,6 +1,6 @@
 #include "hastur.h"
 #include "hastur_helpers.h"
-#include "hastur_stringbuilder.h"
+#include "hastur_string_builder.h"
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
