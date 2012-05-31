@@ -57,6 +57,11 @@ extern "C" {
 time_t hastur_timestamp(void);
 
 /**
+ * If HASTUR_NOW is passed as a timestamp, Hastur will instead query the current time.
+ */
+#define HASTUR_NOW 0
+
+/**
  * Send a counter with the given name.
  */
 int hastur_counter(const char *name, int value);
