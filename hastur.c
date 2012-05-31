@@ -38,10 +38,14 @@ int hastur_counter_v(const char *name, int value, time_t timestamp, ...) {
   labels = __hastur_generate_labels(argp);
   va_end(argp);
 
+  if(timestamp == 0) {
+    timestamp = hastur_timestamp();
+  }
+
   json = __hastur_format_json("counter",
 			      "name", HASTUR_STR, name,
 			      "value", HASTUR_INT, value,
-			      "timestamp", HASTUR_LONG, hastur_timestamp(),
+			      "timestamp", HASTUR_LONG, timestamp,
 			      "labels", HASTUR_BARE, labels,
 			      NULL);
 
