@@ -26,6 +26,7 @@ static void format_json_from_va_list(string_builder_t *builder, va_list argp) {
   const char *value_str;
   int value_int;
   long value_long;
+  double value_double;
 
   while(1) {
     label = va_arg(argp, const char *);
@@ -64,6 +65,12 @@ static void format_json_from_va_list(string_builder_t *builder, va_list argp) {
     case HASTUR_LONG:
       value_long = va_arg(argp, long);
       sprintf(sub_buf, "%ld", value_long);
+      string_builder_append(builder, sub_buf);
+      break;
+
+    case HASTUR_DOUBLE:
+      value_double = va_arg(argp, double);
+      sprintf(sub_buf, "%g", value_double);
       string_builder_append(builder, sub_buf);
       break;
 

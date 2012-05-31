@@ -5,8 +5,14 @@
 extern "C" {
 #endif
 
-/**  @file hastur.h
- *   @brief Hastur client public API
+/**
+ * @file hastur.h
+ * @brief Hastur client public API
+ *
+ * This file contains the full public Hastur client API as exposed by
+ * this library.  You can find more general documentation including
+ * hints and tips for message structure in the README.md file included
+ * with this library.
  */
 
 #include <time.h>
@@ -47,19 +53,29 @@ extern "C" {
  * These labels are passed to functions ending in _v as the types in
  * a label/type/value triple.
  *
- * "Bare" values are inserted directly into JSON.
+ * "Bare" values are inserted directly into the JSON output.
  */
 #define HASTUR_BARE     4
 
 /**
- * Return a current timestamp in microseconds since the Unix epoch.
+ * These labels are passed to functions ending in _v as the types in
+ * a label/type/value triple.
+ *
+ * Doubles are turned into JSON floating-point numbers.  Bare
+ * floating-point constants in C are already double, so you don't have
+ * to typecast.
  */
-time_t hastur_timestamp(void);
+#define HASTUR_DOUBLE     5
 
 /**
  * If HASTUR_NOW is passed as a timestamp, Hastur will instead query the current time.
  */
 #define HASTUR_NOW 0
+
+/**
+ * Return a current timestamp in microseconds since the Unix epoch.
+ */
+time_t hastur_timestamp(void);
 
 /**
  * Send a counter with the given name.
