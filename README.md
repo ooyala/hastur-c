@@ -44,6 +44,13 @@ hastur_every(), which will call a function from a background thread:
 
   while(1) { sleep(1); total++; }
 
+All Hastur message calls have a "_v" variation which allow you to pass
+in a timestamp and/or label.  A timestamp can be given in microseconds
+since the Unix epoch, or you can give 0 or HASTUR_NOW to mean "get a
+new timestamp".  You can also get a timestamp for a given time by
+calling hastur_timestamp() at that time.  See "labels" below for more
+specifics about labeling messages.
+
 The Doxygen documentation (see below) has far more specifics.
 
 Is It Documented?
@@ -55,6 +62,19 @@ distributions, have an existing package for Doxygen.
 
 With doxygen installed, type "doxygen hastur.doxygen" to generate
 the documentation.
+
+As a result, you can read the header files and find lots of inline
+documentation on whatever you'd like to know about.
+
+Labels
+------
+
+If you call the "_v" version of a function, such as hastur_gauge_v or
+hastur_event_v, you should include a timestamp parameter and label
+parameters in the call.
+
+If you want the same behavior as the normal version, pass HASTUR_NOW
+for the timestamp and NULL instead of a list of labels.
 
 Mechanism
 ---------
