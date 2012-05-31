@@ -2,3 +2,4 @@
 libhastur.a
 tester
 tester.dSYM
+doc/*
