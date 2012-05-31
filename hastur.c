@@ -23,7 +23,7 @@ int hastur_counter(const char *name, int value) {
 				   "name", HVALUE_STR, name,
 				   "value", HVALUE_INT, value,
 				   "timestamp", HVALUE_LONG, hastur_timestamp(),
-				   "labels", HVALUE_STR, "{}",
+				   "labels", HVALUE_BARE, "{}",
 				   NULL);
 
   return json ? __hastur_send(json) : JSON_ERROR;

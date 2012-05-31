@@ -62,6 +62,11 @@ const char *__format_json(const char *message_type, ...) {
       append_str("\"");
       break;
 
+    case HVALUE_BARE:
+      value_str = va_arg(argp, const char *);
+      append_str(value_str);
+      break;
+
     case HVALUE_INT:
       value_int = va_arg(argp, int);
       sprintf(sub_buf, "%d", value_int);
