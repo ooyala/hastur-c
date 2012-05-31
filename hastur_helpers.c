@@ -14,7 +14,18 @@
 #define BUFLEN (64 * 1024)
 
 char buf[BUFLEN];
+char *buf_index = NULL;
+char *buf_end = buf + BUFLEN;
 char sub_buf[BUFLEN];  /* For formatting individual args */
+
+static void append_str(const char *str) {
+  int len = strlen(str);
+
+  if(buf_index >= buf_end) return;
+
+  strncpy(buf_index, str, buf_end - buf_index);
+  buf_index += len;
+}
 
 const char *__format_json(const char *message_type, ...) {
   /* varargs list for label/type/value triples */
@@ -25,52 +36,51 @@ const char *__format_json(const char *message_type, ...) {
   int value_int;
   long value_long;
 
-  buf[0] = '\0';  /* NUL-terminate the buffer */
+  buf[0] = '\0';  /* NUL-terminate and reset the buffer */
+  buf_index = buf;
+
   va_start(argp, message_type);
 
-  /* TODO(noah): Add a string-builder for efficiency? */
-  strncat(buf, "{\"type\":\"", BUFLEN);
-  strncat(buf, message_type, BUFLEN);
-  strncat(buf, "\",", BUFLEN);
+  append_str("{\"type\":\"");
+  append_str(message_type);
+  append_str("\"");
 
   while(1) {
     label = va_arg(argp, const char *);
     if(!label) break;  /* When we hit a NULL, stop. */
 
-    strncat(buf, "\"", BUFLEN);
-    strncat(buf, label, BUFLEN);
-    strncat(buf, "\":", BUFLEN);
+    append_str(",\"");
+    append_str(label);
+    append_str("\":");
 
     value_type = va_arg(argp, int);
     switch(value_type) {
     case HVALUE_STRING:
       value_str = va_arg(argp, const char *);
-      strncat(buf, "\"", BUFLEN);
-      strncat(buf, value_str, BUFLEN);  /* TODO: escape quotes */
-      strncat(buf, "\"", BUFLEN);
+      append_str("\"");
+      append_str(value_str);  /* TODO: escape quotes */
+      append_str("\"");
       break;
 
     case HVALUE_INT:
       value_int = va_arg(argp, int);
       sprintf(sub_buf, "%d", value_int);
-      strncat(buf, sub_buf, BUFLEN);
+      append_str(sub_buf);
       break;
 
     case HVALUE_LONG:
       value_long = va_arg(argp, long);
       sprintf(sub_buf, "%ld", value_long);
-      strncat(buf, sub_buf, BUFLEN);
+      append_str(sub_buf);
       break;
 
     default:
       fprintf(stderr, "Unrecognized value type %d!", value_type);
       /* And continue... */
     }
-
-    strncat(buf, ",", BUFLEN);
   }
 
-  strncat(buf, "\"c\": 1}", BUFLEN);
+  append_str("}");
 
   va_end(argp);
 
