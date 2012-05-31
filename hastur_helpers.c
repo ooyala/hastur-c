@@ -18,6 +18,12 @@ char *buf_index = NULL;
 char *buf_end = buf + BUFLEN;
 char sub_buf[BUFLEN];  /* For formatting individual args */
 
+/*
+ * A string builder.  Just using strncat repeatedly will iterate
+ * through the whole built string each time, resulting in quadratic
+ * total time.  By keeping a tail pointer into the buffer, this
+ * function generates in linear time.
+ */
 static void append_str(const char *str) {
   int len = strlen(str);
 
@@ -36,7 +42,8 @@ const char *__format_json(const char *message_type, ...) {
   int value_int;
   long value_long;
 
-  buf[0] = '\0';  /* NUL-terminate and reset the buffer */
+  /* NUL-terminate and reset the buffer */
+  buf[0] = '\0';
   buf_index = buf;
 
   va_start(argp, message_type);
