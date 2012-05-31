@@ -164,7 +164,9 @@ const char *__hastur_generate_labels(va_list argp) {
 
   builder = string_builder_new(label_buf, BUFLEN);
 
+  string_builder_append_char(builder, '{');
   format_json_from_va_list(builder, argp);
+  string_builder_append_char(builder, '}');
 
-  return "";
+  return label_buf;
 }
