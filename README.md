@@ -53,6 +53,9 @@ We use Doxygen for our C API.  See www.doxygen.org for details about
 how to install and run it.  Most package systems, including Linux
 distributions, have an existing package for Doxygen.
 
+With doxygen installed, type "doxygen hastur.doxygen" to generate
+the documentation.
+
 Mechanism
 ---------
 
