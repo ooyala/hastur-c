@@ -124,3 +124,26 @@ same name and timestamp, you'll lose all but one.
 
 Keep in mind that timestamps are in microseconds -- you're not limited
 to one event with the same name per second.
+
+Why Is It in C?
+---------------
+
+C is portable, linkable from every other language, and there are no
+worries about ABI or compatibility between two different compilers on
+the same system.  Any other language can easily call C through
+dyload/JNA/FFI or wrap it via SWIG.  I don't need to worry about
+trying to support STL hash tables for labels.  I don't need to worry
+about accepting various STL/Boost structures as arguments.  I don't
+need to worry about whether using exceptions will mean that people
+attempting to write sane, reliable C++ simply can't use my library or
+whether somebody has linked to a library (libjpeg?) that takes
+callbacks but wasn't recompiled with C++ exception support despite
+being written in plain C.
+
+C is an excellent least common denominator.  C++ is not.
+
+When I want a modern language rather than a least common denominator,
+I use the Ruby bindings.  They have a better interface with a far
+shorter line count.  Or if you prefer Perl or Python, you should be be
+able to produce roughly the same functionality with about 300 lines of
+code.
