@@ -1,5 +1,5 @@
-#ifndef __HASTUR_STRINGBUILDER__
-#define __HASTUR_STRINGBUILDER__
+#ifndef __HASTUR_STRING_BUILDER__
+#define __HASTUR_STRING_BUILDER__
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,4 +20,4 @@ void string_builder_append_char(string_builder_t *builder, char c);
 }
 #endif
 
-#endif /* __HASTUR_STRINGBUILDER__ */
+#endif /* __HASTUR_STRING_BUILDER__ */
