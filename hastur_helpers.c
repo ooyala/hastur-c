@@ -29,9 +29,9 @@ const char *__format_json(const char *message_type, ...) {
   va_start(argp, message_type);
 
   /* TODO(noah): Add a string-builder for efficiency? */
-  strncat(buf, "{\n\"type\":\"", BUFLEN);
+  strncat(buf, "{\"type\":\"", BUFLEN);
   strncat(buf, message_type, BUFLEN);
-  strncat(buf, "\"", BUFLEN);
+  strncat(buf, "\",", BUFLEN);
 
   while(1) {
     label = va_arg(argp, const char *);
