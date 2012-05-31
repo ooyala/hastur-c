@@ -40,20 +40,20 @@ const char * format_json(const char *message_type, ...) {
 
     value_type = va_arg(argp, int);
     switch(value_type) {
-    case VALUE_STRING:
+    case HVALUE_STRING:
       value_str = va_arg(argp, const char *);
       strncat(buf, BUFLEN, "\"");
       strncat(buf, BUFLEN, value_str);  /* TODO: escape quotes */
       strncat(buf, BUFLEN, "\"");
       break;
 
-    case VALUE_INT:
+    case HVALUE_INT:
       value_int = va_arg(argp, int);
       itoa(value_int, sub_buf, 10);
       strncat(buf, BUFLEN, subbuf);
       break;
 
-    case VALUE_LONG:
+    case HVALUE_LONG:
       value_long = va_arg(argp, long);
       ltoa(value_long, sub_buf, 10);
       strncat(buf, BUFLEN, subbuf);
@@ -113,4 +113,24 @@ int hastur_send(const char *message) {
   close(s);
 
   return 0;
+}
+
+static const char *__get_tid(void) {
+  /* TODO: useful get_tid() */
+  return "main";
+}
+
+#ifdef WIN32
+#define getpid _getpid
+#endif
+
+char labels_buf[BUFLEN];
+
+const char *__default_labels(void) {
+  int pid = getpid();
+
+  snprintf(labels_buf, BUFLEN, "{\"app\":\"%s\",\"pid\":%d,\"tid\":%s}",
+	   hastur_get_app_name(), pid, __get_tid());
+
+  return labels_buf;
 }

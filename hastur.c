@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include "hastur.h"
 #include "hastur_helpers.h"
@@ -13,16 +14,16 @@ time_t hastur_timestamp(void) {
 
   gettimeofday(&tv, NULL);  /* TODO: test that this is UTC */
 
-  return tv.tv_sec * 1_000_000 + tv.tv_usec;
+  return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
 int hastur_counter(const char *name, int value) {
-  const char *json = format_json("counter",
-				 "name", VALUE_STR, name,
-				 "value", VALUE_INT, value,
-				 "timestamp", VALUE_LONG, hastur_timestamp(),
-				 "labels", VALUE_STR, "{}",
-				 NULL);
+  const char *json = __format_json("counter",
+				   "name", HVALUE_STR, name,
+				   "value", HVALUE_INT, value,
+				   "timestamp", HVALUE_LONG, hastur_timestamp(),
+				   "labels", HVALUE_STR, "{}",
+				   NULL);
 
   return json ? hastur_send(json) : JSON_ERROR;
 }
@@ -37,18 +38,31 @@ void hastur_set_agent_port(int port) {
   hastur_agent_port = port;
 }
 
-static deliver_with_type hastur_deliver_with = NULL;
+static deliver_with_type hastur_deliver_with_callback = NULL;
 static void *hastur_deliver_with_user_data = NULL;
 
 deliver_with_type hastur_get_deliver_with(void) {
-  return hastur_deliver_with;
+  return hastur_deliver_with_callback;
 }
 
-deliver_with_type hastur_get_deliver_with_user_data(void) {
+void *hastur_get_deliver_with_user_data(void) {
   return hastur_deliver_with_user_data;
 }
 
 void hastur_deliver_with(deliver_with_type callback, void *user_data) {
-  hastur_deliver_with = callback;
+  hastur_deliver_with_callback = callback;
   hastur_deliver_with_user_data = user_data;
+}
+
+static char *hastur_app_name = NULL;
+
+const char* hastur_get_app_name(void) {
+  return hastur_app_name;
+}
+
+void hastur_set_app_name(const char *app_name) {
+  if(hastur_app_name) {
+    free(hastur_app_name);
+  }
+  hastur_app_name = strdup(app_name);
 }
