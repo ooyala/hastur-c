@@ -28,5 +28,10 @@ int main(int argc, char **argv) {
 
   hastur_counter_v("labeled.counter", 1, HASTUR_NOW, "mylabel1", HASTUR_INT, 7, "mylabel2", HASTUR_STRING, "bobo", NULL);
 
+  hastur_counter_v("labeled.counter.2", 1, HASTUR_NOW,
+		   HASTUR_LABEL_INT("mylabel1", 7),
+		   HASTUR_LABEL_STRING("mylabel2", "bobo"),
+		   NULL);
+
   return 0;
 }
