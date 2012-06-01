@@ -48,7 +48,7 @@ time_t hastur_timestamp(void) {
     return json ? __hastur_send(json) : JSON_ERROR;                                 \
 }                                                                                   \
                                                                                     \
-int hastur_ ## msg_name ## _v(const char *name, int value, time_t timestamp, ...) { \
+int hastur_ ## msg_name ## _v(params, time_t timestamp, ...) { \
   const char *json;                                                                 \
   va_list argp;                                                                     \
   const char *labels;                                                               \
@@ -64,7 +64,7 @@ int hastur_ ## msg_name ## _v(const char *name, int value, time_t timestamp, ...
   return json ? __hastur_send(json) : JSON_ERROR;                                   \
 }                                                                                   \
                                                                                     \
-int hastur_ ## msg_name ## _labelstr(const char *name, int value, time_t timestamp, \
+int hastur_ ## msg_name ## _labelstr(params, time_t timestamp,                      \
                                      const char *labels) {                          \
   const char *json;                                                                 \
   if(timestamp == 0) { timestamp = hastur_timestamp(); }                            \
@@ -76,26 +76,25 @@ int hastur_ ## msg_name ## _labelstr(const char *name, int value, time_t timesta
   return json ? __hastur_send(json) : JSON_ERROR;                                   \
 }
 
+/* TODO: Event is separate */
+
+/* Now, actually declare Hastur message functions */
+
 ALL_MESSAGE_FUNCS(counter, WRAP2(const char *name, int value),
-		   WRAP2(HASTUR_STRING_LABEL("name", name),
-			 HASTUR_INT_LABEL("value", value)));
+		  WRAP2(HASTUR_STRING_LABEL("name", name),
+			HASTUR_INT_LABEL("value", value)));
 
-int hastur_counter_labelstring(const char *name, int value, time_t timestamp, const char *labels) {
-  const char *json;
+ALL_MESSAGE_FUNCS(gauge, WRAP2(const char *name, double value),
+		  WRAP2(HASTUR_STRING_LABEL("name", name),
+			HASTUR_DOUBLE_LABEL("value", value)));
 
-  if(timestamp == 0) {
-    timestamp = hastur_timestamp();
-  }
+ALL_MESSAGE_FUNCS(mark, WRAP2(const char *name, const char *value),
+		  WRAP2(HASTUR_STRING_LABEL("name", name),
+			HASTUR_STRING_LABEL("value", value)));
 
-  json = __hastur_format_json("counter",
-			      "name", HASTUR_STR, name,
-			      "value", HASTUR_INT, value,
-			      "timestamp", HASTUR_LONG, timestamp,
-			      "labels", HASTUR_BARE, labels,
-			      NULL);
-
-  return json ? __hastur_send(json) : JSON_ERROR;
-}
+ALL_MESSAGE_FUNCS(log, WRAP2(const char *subject, const char *json_data),
+		  WRAP2(HASTUR_STRING_LABEL("subject", subject),
+			HASTUR_STRING_LABEL("data", json_data)));
 
 static int hastur_agent_port = 8150;
 

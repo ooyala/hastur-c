@@ -123,7 +123,7 @@ int hastur_counter_v(const char *name, int value, time_t timestamp, ...);
  * Send a counter with the given name, value and timestamp, and the
  * specified labels.  Labels are specified as a JSON string.
  */
-int hastur_counter_labelstring(const char *name, int value, time_t timestamp, const char *labels);
+int hastur_counter_labelstr(const char *name, int value, time_t timestamp, const char *labels);
 
 /**
  * A function type for delivering messages.  User_data can be ignored
