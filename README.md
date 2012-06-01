@@ -24,8 +24,8 @@ Build this library and link your application against it.
 
 Add Hastur calls to your application, such as:
 
-  hastur_counter("my.thing.to.count", 1);          # Add 1 to my.thing.to.count
-  hastur_gauge("other.thing.foo_latency", 371.1);  # Record a latency of 371.1
+    hastur_counter("my.thing.to.count", 1);          # Add 1 to my.thing.to.count
+    hastur_gauge("other.thing.foo_latency", 371.1);  # Record a latency of 371.1
 
 You can find extensive per-method documentation in the header file, or
 see "Is It Documented?" below for friendly Doxygen documentation.
@@ -37,15 +37,15 @@ to.  See the hastur-server ruby gem for specifics.
 Hastur optionally allows you to send at regular intervals using
 hastur_every(), which will call a function from a background thread:
 
-  static int total = 0;
+    static int total = 0;
 
-  void send_back_stats(void *user_data) {
-    hastur_gauge("total.counting.so.far", total);
-  }
+    void send_back_stats(void *user_data) {
+      hastur_gauge("total.counting.so.far", total);
+    }
 
-  hastur_every("minute", send_back_stats);
+    hastur_every("minute", send_back_stats);
 
-  while(1) { sleep(1); total++; }
+    while(1) { sleep(1); total++; }
 
 All Hastur message calls have a "_v" variation which allow you to pass
 in a timestamp and/or label.  A timestamp can be given in microseconds
@@ -72,9 +72,21 @@ documentation on whatever you'd like to know about.
 Labels
 ------
 
-If you call the "_v" version of a function, such as hastur_gauge_v or
-hastur_event_v, you should include a timestamp parameter and label
-parameters in the call.
+Every Hastur message can have one or many attached labels.  A few
+things (application name, process ID, thread ID) will be attached
+automatically to all messages sent, and other information may be sent
+in specific circumstances (e.g. process or library information).
+
+To specify more labels, call the "_v" version of a function such as
+hastur_gauge_v or hastur_event_v.  You should include a timestamp
+parameter and label parameters in the call.
+
+Example:
+
+    hastur_counter_v("my.counter", 2, HASTUR_NOW,
+                     HASTUR_INT_LABEL("mylabel", 7),
+                     HASTUR_DOUBLE_LABEL("alabel", 29.4),
+                     NULL);
 
 If you want the same behavior as the normal version, pass HASTUR_NOW
 for the timestamp and NULL instead of a list of labels.
@@ -115,7 +127,7 @@ we made it easy to use.
 hash of tags about what that call means and what data goes with it.
 For instance, you might call:
 
-  hastur_gauge_v("my.thing.total_latency", 317.4, NULL, "units", "usec", NULL);
+    hastur_gauge_v("my.thing.total_latency", 317.4, NULL, "units", "usec", NULL);
 
 Eventually you'll be able to query messages by label through the REST
 interface, but for now that's inconvenient.  However, it's easy to
@@ -124,7 +136,7 @@ powerful way to mark data as being interesting to alert you about.
 
 For example:
 
-  hastur_gauge_v("my.thing.total_latency", 317.4, NULL, "severity", "omg", NULL);
+    hastur_gauge_v("my.thing.total_latency", 317.4, NULL, "severity", "omg", NULL);
 
 It's easy to subscribe to any latency with a severity label in the
 streaming interface, which would let you calculate how bad the overall
@@ -134,10 +146,10 @@ trigger interface.
 3. You can group multiple messages together by giving them the same
 timestamp.  For instance:
 
-  ts = hastur_timestamp(NULL);
-  hastur_gauge_v("my.thing.latency1", val1, ts, NULL);
-  hastur_gauge_v("my.thing.latency2", val2, ts, NULL);
-  hastur_counter_v("my.thing.counter371", 1, ts, NULL);
+    ts = hastur_timestamp(NULL);
+    hastur_gauge_v("my.thing.latency1", val1, ts, NULL);
+    hastur_gauge_v("my.thing.latency2", val2, ts, NULL);
+    hastur_counter_v("my.thing.counter371", 1, ts, NULL);
 
 This makes it easy to query all events with exactly that timestamp
 and the same prefix ("my.thing.*"), and otherwise to make sure they're
