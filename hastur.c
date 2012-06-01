@@ -18,25 +18,70 @@ time_t hastur_timestamp(void) {
   return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
-int hastur_counter(const char *name, int value) {
-  const char *json = __hastur_format_json("counter",
-					  "name", HASTUR_STR, name,
-					  "value", HASTUR_INT, value,
-					  "timestamp", HASTUR_LONG, hastur_timestamp(),
-					  "labels", HASTUR_BARE, __hastur_default_labels(),
-					  NULL);
+/* Fake out the macro system so I can pass multiple underlying
+   arguments through a single macro argument */
+#define WRAP1(a) a
+#define WRAP2(a, b) a, b
+#define WRAP3(a, b, c) a, b, c
+#define WRAP4(a, b, c, d) a, b, c, d
+#define WRAP5(a, b, c, d, e) a, b, c, d, e
 
-  return json ? __hastur_send(json) : JSON_ERROR;
+/* Define all the various methods to send Hastur messages.  They're
+   very repetitive, so we set up macros to generate them and then call
+   those macros. */
+
+/* You might ask, why not make multiple smaller macros and call them
+   from a single ALL_MESSAGE_FUNCS top-level macro?  It's a reasonable
+   approach.  But the horrid WRAP() thing I'm using to pass multiple
+   arguments through a single macro argument makes that very
+   difficult... */
+
+#define ALL_MESSAGE_FUNCS(msg_name, params, sent_params)                            \
+  int hastur_ ## msg_name ( params ) {                                              \
+    time_t timestamp = hastur_timestamp();                                          \
+    const char *json;                                                               \
+    json = __hastur_format_json( #msg_name ,                                        \
+                                 sent_params,                                       \
+                                 "timestamp", HASTUR_LONG, timestamp,               \
+                                 "labels", HASTUR_BARE, __hastur_default_labels(),  \
+                                 NULL);                                             \
+    return json ? __hastur_send(json) : JSON_ERROR;                                 \
+}                                                                                   \
+                                                                                    \
+int hastur_ ## msg_name ## _v(const char *name, int value, time_t timestamp, ...) { \
+  const char *json;                                                                 \
+  va_list argp;                                                                     \
+  const char *labels;                                                               \
+  va_start(argp, timestamp);                                                        \
+  labels = __hastur_generate_labels(argp);                                          \
+  va_end(argp);                                                                     \
+  if(timestamp == 0) { timestamp = hastur_timestamp(); }                            \
+  json = __hastur_format_json( #msg_name ,                                          \
+                               sent_params,                                         \
+                               "timestamp", HASTUR_LONG, timestamp,                 \
+                               "labels", HASTUR_BARE, labels,                       \
+                               NULL);                                               \
+  return json ? __hastur_send(json) : JSON_ERROR;                                   \
+}                                                                                   \
+                                                                                    \
+int hastur_ ## msg_name ## _labelstr(const char *name, int value, time_t timestamp, \
+                                     const char *labels) {                          \
+  const char *json;                                                                 \
+  if(timestamp == 0) { timestamp = hastur_timestamp(); }                            \
+  json = __hastur_format_json( #msg_name ,                                          \
+                               sent_params,                                         \
+                               "timestamp", HASTUR_LONG, timestamp,                 \
+                               "labels", HASTUR_BARE, labels,                       \
+                               NULL);                                               \
+  return json ? __hastur_send(json) : JSON_ERROR;                                   \
 }
 
-int hastur_counter_v(const char *name, int value, time_t timestamp, ...) {
-  const char *json;
-  va_list argp;
-  const char *labels;
+ALL_MESSAGE_FUNCS(counter, WRAP2(const char *name, int value),
+		   WRAP2(HASTUR_STRING_LABEL("name", name),
+			 HASTUR_INT_LABEL("value", value)));
 
-  va_start(argp, timestamp);
-  labels = __hastur_generate_labels(argp);
-  va_end(argp);
+int hastur_counter_labelstring(const char *name, int value, time_t timestamp, const char *labels) {
+  const char *json;
 
   if(timestamp == 0) {
     timestamp = hastur_timestamp();

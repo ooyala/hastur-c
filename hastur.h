@@ -115,9 +115,15 @@ int hastur_counter(const char *name, int value);
 /**
  * Send a counter with the given name, value and timestamp, and the
  * specified labels.  Labels are specified with the
- * HASTUR_[TYPE]_LABEL macros, followed by a trailing NULL.
+ * HASTUR_[TYPE]_LABEL macros followed by a trailing NULL.
  */
 int hastur_counter_v(const char *name, int value, time_t timestamp, ...);
+
+/**
+ * Send a counter with the given name, value and timestamp, and the
+ * specified labels.  Labels are specified as a JSON string.
+ */
+int hastur_counter_labelstring(const char *name, int value, time_t timestamp, const char *labels);
 
 /**
  * A function type for delivering messages.  User_data can be ignored
