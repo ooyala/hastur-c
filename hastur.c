@@ -48,7 +48,7 @@ time_t hastur_timestamp(void) {
     return json ? __hastur_send(json) : JSON_ERROR;                                 \
 }                                                                                   \
                                                                                     \
-int hastur_ ## msg_name ## _v(params, time_t timestamp, ...) { \
+int hastur_ ## msg_name ## _v(params, time_t timestamp, ...) {                      \
   const char *json;                                                                 \
   va_list argp;                                                                     \
   const char *labels;                                                               \
@@ -95,6 +95,30 @@ ALL_MESSAGE_FUNCS(mark, WRAP2(const char *name, const char *value),
 ALL_MESSAGE_FUNCS(log, WRAP2(const char *subject, const char *json_data),
 		  WRAP2(HASTUR_STRING_LABEL("subject", subject),
 			HASTUR_STRING_LABEL("data", json_data)));
+
+ALL_MESSAGE_FUNCS(register_process, WRAP2(const char *name, const char *json_data),
+		  WRAP2(HASTUR_STRING_LABEL("name", name),
+			HASTUR_STRING_LABEL("data", json_data)));
+
+ALL_MESSAGE_FUNCS(info_process, WRAP2(const char *tag, const char *json_data),
+		  WRAP2(HASTUR_STRING_LABEL("tag", tag),
+			HASTUR_STRING_LABEL("data", json_data)));
+
+ALL_MESSAGE_FUNCS(info_agent, WRAP2(const char *tag, const char *json_data),
+		  WRAP2(HASTUR_STRING_LABEL("tag", tag),
+			HASTUR_STRING_LABEL("data", json_data)));
+
+ALL_MESSAGE_FUNCS(register_plugin, WRAP4(const char *name, const char *plugin_path,
+                                         const char *plugin_args, double plugin_interval),
+		  WRAP4(HASTUR_STRING_LABEL("name", name),
+			HASTUR_STRING_LABEL("plugin_path", plugin_path),
+			HASTUR_STRING_LABEL("plugin_args", plugin_args),
+			HASTUR_DOUBLE_LABEL("interval", plugin_interval)));
+
+ALL_MESSAGE_FUNCS(hb_process, WRAP3(const char *name, double value, double timeout),
+		  WRAP3(HASTUR_STRING_LABEL("name", name),
+			HASTUR_DOUBLE_LABEL("value", value),
+			HASTUR_DOUBLE_LABEL("timeout", timeout)));
 
 static int hastur_agent_port = 8150;
 

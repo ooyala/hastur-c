@@ -126,6 +126,57 @@ int hastur_counter_v(const char *name, int value, time_t timestamp, ...);
 int hastur_counter_labelstr(const char *name, int value, time_t timestamp, const char *labels);
 
 /**
+ * Send a gauge with the given name.
+ */
+int hastur_gauge(const char *name, double value);
+
+/**
+ * Send a gauge with the given name, value and timestamp, and the
+ * specified labels.  Labels are specified with the
+ * HASTUR_[TYPE]_LABEL macros followed by a trailing NULL.
+ */
+int hastur_gauge_v(const char *name, double value, time_t timestamp, ...);
+
+/**
+ * Send a gauge with the given name, value and timestamp, and the
+ * specified labels.  Labels are specified as a JSON string.
+ */
+int hastur_gauge_labelstr(const char *name, double value, time_t timestamp, const char *labels);
+
+/**
+ * Send a mark with the given name.
+ */
+int hastur_mark(const char *name, const char *value);
+
+/**
+ * Send a mark with the given name, value and timestamp, and the
+ * specified labels.  Labels are specified with the
+ * HASTUR_[TYPE]_LABEL macros followed by a trailing NULL.
+ */
+int hastur_mark_v(const char *name, const char *value, time_t timestamp, ...);
+
+/**
+ * Send a mark with the given name, value and timestamp, and the
+ * specified labels.  Labels are specified as a JSON string.
+ */
+int hastur_mark_labelstr(const char *name, const char *value, time_t timestamp, const char *labels);
+
+/**
+ * Alias hb_process, the heartbeat message, as "heartbeat" for convenience.
+ */
+#define hastur_heartbeat hastur_hb_process
+
+/**
+ * Alias hb_process, the heartbeat message, as "heartbeat" for convenience.
+ */
+#define hastur_heartbeat_v hastur_hb_process_v
+
+/**
+ * Alias hb_process, the heartbeat message, as "heartbeat" for convenience.
+ */
+#define hastur_heartbeat_labelstr hastur_hb_process_labelstr
+
+/**
  * A function type for delivering messages.  User_data can be ignored
  * if desired.  Message is the message to be delivered.  The function
  * should return 0 for success and less than 0 for failure.
