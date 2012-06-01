@@ -70,32 +70,32 @@ extern "C" {
 /**
  * Declare a label of type string.
  */
-#define HASTUR_LABEL_STR(label, value) (label), HASTUR_STRING, (const char *)(value)
+#define HASTUR_STR_LABEL(label, value) (label), HASTUR_STRING, (const char *)(value)
 
 /**
  * Declare a label of type string.
  */
-#define HASTUR_LABEL_STRING(label, value) (label), HASTUR_STRING, (const char *)(value)
+#define HASTUR_STRING_LABEL(label, value) (label), HASTUR_STRING, (const char *)(value)
 
 /**
  * Declare a label of type integer.
  */
-#define HASTUR_LABEL_INT(label, value) (label), HASTUR_INT, (int)(value)
+#define HASTUR_INT_LABEL(label, value) (label), HASTUR_INT, (int)(value)
 
 /**
  * Declare a label of type long.
  */
-#define HASTUR_LABEL_LONG(label, value) (label), HASTUR_LONG, (long)(value)
+#define HASTUR_LONG_LABEL(label, value) (label), HASTUR_LONG, (long)(value)
 
 /**
  * Declare a label with a bare JSON string as its contents
  */
-#define HASTUR_LABEL_BARE(label, value) (label), HASTUR_BARE, (const char *)(value)
+#define HASTUR_BARE_LABEL(label, value) (label), HASTUR_BARE, (const char *)(value)
 
 /**
  * Declare a label of type double.  Also usable for floats.
  */
-#define HASTUR_LABEL_DOUBLE(label, value) (label), HASTUR_DOUBLE, (double)(value)
+#define HASTUR_DOUBLE_LABEL(label, value) (label), HASTUR_DOUBLE, (double)(value)
 
 /**
  * If HASTUR_NOW is passed as a timestamp, Hastur will instead query the current time.
@@ -113,9 +113,9 @@ time_t hastur_timestamp(void);
 int hastur_counter(const char *name, int value);
 
 /**
- * Send a counter with the given name, value and timestamp, and the specified
- * labels.  Labels are specified with the HASTUR_LABEL_(type) macros,
- * above.
+ * Send a counter with the given name, value and timestamp, and the
+ * specified labels.  Labels are specified with the
+ * HASTUR_[TYPE]_LABEL macros, followed by a trailing NULL.
  */
 int hastur_counter_v(const char *name, int value, time_t timestamp, ...);
 
