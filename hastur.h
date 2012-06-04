@@ -18,7 +18,7 @@ extern "C" {
 #include <time.h>
 
 /**
- * These labels are passed to functions ending in _v as the types in
+ * These constants are passed to functions ending in _v as the types in
  * a label/type/value triple.
  *
  * Strings are turned into JSON strings.
@@ -26,46 +26,56 @@ extern "C" {
 #define HASTUR_STRING   1
 
 /**
- * These labels are passed to functions ending in _v as the types in
- * a label/type/value triple.
+ * These constants are passed to functions ending in _v as the types
+ * in a label/type/value triple.
  *
  * Strings are turned into JSON strings.
  */
 #define HASTUR_STR      1
 
 /**
- * These labels are passed to functions ending in _v as the types in
- * a label/type/value triple.
+ * These constants are passed to functions ending in _v as the types
+ * in a label/type/value triple.
  *
  * Ints are turned into JSON integers.
  */
 #define HASTUR_INT      2
 
 /**
- * These labels are passed to functions ending in _v as the types in
- * a label/type/value triple.
+ * These constants are passed to functions ending in _v as the types
+ * in a label/type/value triple.
  *
  * Longs are turned into JSON integers.
  */
 #define HASTUR_LONG     3
 
 /**
- * These labels are passed to functions ending in _v as the types in
- * a label/type/value triple.
+ * These constants are passed to functions ending in _v as the types
+ * in a label/type/value triple.
  *
  * "Bare" values are inserted directly into the JSON output.
  */
 #define HASTUR_BARE     4
 
 /**
- * These labels are passed to functions ending in _v as the types in
- * a label/type/value triple.
+ * These constants are passed to functions ending in _v as the types
+ * in a label/type/value triple.
  *
  * Doubles are turned into JSON floating-point numbers.  Bare
  * floating-point constants in C are already double, so you don't have
  * to typecast.
  */
 #define HASTUR_DOUBLE     5
+
+/**
+ * These constants are passed to functions ending in _v as the types
+ * in a label/type/value triple.
+ *
+ * String arrays are turned into JSON arrays of strings.  These aren't
+ * generally needed for labels, but are used internally for events
+ * and could be useful for other kinds of rendering in some cases.
+ */
+#define HASTUR_STR_ARRAY  6
 
 /**
  * Declare a label of type string.
@@ -108,7 +118,7 @@ extern "C" {
 time_t hastur_timestamp(void);
 
 /**
- * Send a counter with the given name.
+ * Send a counter with the given name and value.
  */
 int hastur_counter(const char *name, int value);
 
@@ -126,7 +136,7 @@ int hastur_counter_v(const char *name, int value, time_t timestamp, ...);
 int hastur_counter_labelstr(const char *name, int value, time_t timestamp, const char *labels);
 
 /**
- * Send a gauge with the given name.
+ * Send a gauge with the given name and value.
  */
 int hastur_gauge(const char *name, double value);
 
@@ -144,7 +154,7 @@ int hastur_gauge_v(const char *name, double value, time_t timestamp, ...);
 int hastur_gauge_labelstr(const char *name, double value, time_t timestamp, const char *labels);
 
 /**
- * Send a mark with the given name.
+ * Send a mark with the given name and value.
  */
 int hastur_mark(const char *name, const char *value);
 
@@ -160,6 +170,90 @@ int hastur_mark_v(const char *name, const char *value, time_t timestamp, ...);
  * specified labels.  Labels are specified as a JSON string.
  */
 int hastur_mark_labelstr(const char *name, const char *value, time_t timestamp, const char *labels);
+
+/**
+ * Send a log with the given subject and data.  The JSON data is a
+ * JSON object, given as a string.
+ */
+int hastur_log(const char *subject, const char *json_data);
+
+/**
+ * Send a log with the given subject, data and timestamp, and the
+ * specified labels.  Labels are specified with the
+ * HASTUR_[TYPE]_LABEL macros followed by a trailing NULL.  The JSON
+ * data is a JSON object, given as a string.
+ */
+int hastur_log_v(const char *subject, const char *json_data, time_t timestamp, ...);
+
+/**
+ * Send a log with the given subject, data and timestamp, and the
+ * specified labels.  Labels are specified as a JSON string.  The JSON
+ * data is a JSON object, given as a string.
+ */
+int hastur_log_labelstr(const char *subject, const char *json_data, time_t timestamp, const char *labels);
+
+/**
+ * Send a process registration with the given tag and data.  The JSON
+ * data is a JSON object, given as a string.
+ */
+int hastur_reg_process(const char *tag, const char *json_data);
+
+/**
+ * Send a process registration with the given tag, data and timestamp,
+ * and the specified labels.  Labels are specified with the
+ * HASTUR_[TYPE]_LABEL macros followed by a trailing NULL.  The JSON
+ * data is a JSON object, given as a string.
+ */
+int hastur_reg_process_v(const char *tag, const char *json_data, time_t timestamp, ...);
+
+/**
+ * Send a process registration with the given tag, data and timestamp,
+ * and the specified labels.  Labels are specified as a JSON string.
+ * The JSON data is a JSON object, given as a string.
+ */
+int hastur_reg_process_labelstr(const char *tag, const char *json_data, time_t timestamp, const char *labels);
+
+/**
+ * Send process information with the given tag and data.  The JSON
+ * data is a JSON object, given as a string.
+ */
+int hastur_info_process(const char *tag, const char *json_data);
+
+/**
+ * Send process information with the given tag, data and timestamp,
+ * and the specified labels.  Labels are specified with the
+ * HASTUR_[TYPE]_LABEL macros followed by a trailing NULL.  The JSON
+ * data is a JSON object, given as a string.
+ */
+int hastur_info_process_v(const char *tag, const char *json_data, time_t timestamp, ...);
+
+/**
+ * Send process information with the given tag, data and timestamp,
+ * and the specified labels.  Labels are specified as a JSON string.
+ * The JSON data is a JSON object, given as a string.
+ */
+int hastur_info_process_labelstr(const char *tag, const char *json_data, time_t timestamp, const char *labels);
+
+/**
+ * Send agent information with the given tag and data.  The JSON
+ * data is a JSON object, given as a string.
+ */
+int hastur_info_agent(const char *tag, const char *json_data);
+
+/**
+ * Send agent information with the given tag, data and timestamp,
+ * and the specified labels.  Labels are specified with the
+ * HASTUR_[TYPE]_LABEL macros followed by a trailing NULL.  The JSON
+ * data is a JSON object, given as a string.
+ */
+int hastur_info_agent_v(const char *tag, const char *json_data, time_t timestamp, ...);
+
+/**
+ * Send agent information with the given tag, data and timestamp,
+ * and the specified labels.  Labels are specified as a JSON string.
+ * The JSON data is a JSON object, given as a string.
+ */
+int hastur_info_agent_labelstr(const char *tag, const char *json_data, time_t timestamp, const char *labels);
 
 /**
  * Alias hb_process, the heartbeat message, as "heartbeat" for convenience.
@@ -184,6 +278,14 @@ int hastur_mark_labelstr(const char *name, const char *value, time_t timestamp, 
 typedef int (*deliver_with_type)(const char *message, void *user_data);
 
 /**
+ * A function type for getting timestamps.  User_data can be ignored
+ * if desired.  New_time is a pointer to the new timestamp as time_t.
+ * The function should return 0 for success and less than 0 for
+ * failure.
+ */
+typedef int (*timestamp_with_type)(time_t *new_time, void *user_data);
+
+/**
  * Instruct Hastur to use the specified callback to deliver its
  * messages rather than sending them over UDP.  The user_data
  * parameter will be passed to the specified callback.
@@ -201,6 +303,25 @@ deliver_with_type hastur_get_deliver_with(void);
  * was specified.
  */
 void *hastur_get_deliver_with_user_data(void);
+
+/**
+ * Instruct Hastur to use the specified callback to get new timestamps
+ * rather than using the current time.  The user_data parameter will
+ * be passed to the specified callback.
+ */
+void hastur_timestamp_with(timestamp_with_type callback, void *user_data);
+
+/**
+ * Get the callback passed to hastur_timestamp_with, or NULL if none
+ * was specified.
+ */
+timestamp_with_type hastur_get_timestamp_with(void);
+
+/**
+ * Get the user_data passed to hastur_timestamp_with, or NULL if none
+ * was specified.
+ */
+void *hastur_get_timestamp_with_user_data(void);
 
 /**
  * Set the local UDP port for the Hastur agent.  Default is 8150.

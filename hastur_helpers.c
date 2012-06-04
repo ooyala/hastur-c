@@ -47,7 +47,7 @@ static void format_json_from_va_list(string_builder_t *builder, va_list argp) {
     case HASTUR_STRING:
       value_str = va_arg(argp, const char *);
       string_builder_append(builder, "\"");
-      string_builder_append(builder, value_str);  /* TODO: escape quotes */
+      string_builder_append(builder, value_str);  /* TODO: escape string */
       string_builder_append(builder, "\"");
       break;
 
@@ -74,6 +74,25 @@ static void format_json_from_va_list(string_builder_t *builder, va_list argp) {
       string_builder_append(builder, sub_buf);
       break;
 
+    case HASTUR_STR_ARRAY: {
+      const char **array_pointer;
+      array_pointer = (const char **)va_arg(argp, const char **);
+
+      /* TODO(noah): Use string builder */
+      /* TODO(noah): Escape strings */
+      strcpy(sub_buf, "[\"");
+
+      while(*array_pointer) {
+	strncat(sub_buf, *array_pointer, BUFLEN);
+	strncat(sub_buf, "\",\"", BUFLEN);
+
+	array_pointer++;
+      }
+
+      strncat(sub_buf, "\"]", BUFLEN);
+      break;
+    }
+
     default:
       fprintf(stderr, "Unrecognized value type %d!", value_type);
       /* And continue... */
@@ -92,7 +111,7 @@ const char *__hastur_format_json(const char *message_type, ...) {
 
   string_builder_append(builder, "{\"type\":\"");
   string_builder_append(builder, message_type);
-  string_builder_append(builder, "\"");
+  string_builder_append(builder, "\",");
 
   format_json_from_va_list(builder, argp);
 

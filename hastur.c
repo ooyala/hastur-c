@@ -10,14 +10,6 @@
 /* Return an error code meaning that JSON wasn't rendered correctly */
 #define JSON_ERROR (-1)
 
-time_t hastur_timestamp(void) {
-  struct timeval tv;
-
-  gettimeofday(&tv, NULL);
-
-  return tv.tv_sec * 1000000 + tv.tv_usec;
-}
-
 /* Fake out the macro system so I can pass multiple underlying
    arguments through a single macro argument */
 #define WRAP1(a) a
@@ -96,7 +88,7 @@ ALL_MESSAGE_FUNCS(log, WRAP2(const char *subject, const char *json_data),
 		  WRAP2(HASTUR_STRING_LABEL("subject", subject),
 			HASTUR_STRING_LABEL("data", json_data)));
 
-ALL_MESSAGE_FUNCS(register_process, WRAP2(const char *name, const char *json_data),
+ALL_MESSAGE_FUNCS(reg_process, WRAP2(const char *name, const char *json_data),
 		  WRAP2(HASTUR_STRING_LABEL("name", name),
 			HASTUR_STRING_LABEL("data", json_data)));
 
@@ -108,7 +100,7 @@ ALL_MESSAGE_FUNCS(info_agent, WRAP2(const char *tag, const char *json_data),
 		  WRAP2(HASTUR_STRING_LABEL("tag", tag),
 			HASTUR_STRING_LABEL("data", json_data)));
 
-ALL_MESSAGE_FUNCS(register_plugin, WRAP4(const char *name, const char *plugin_path,
+ALL_MESSAGE_FUNCS(reg_pluginv1, WRAP4(const char *name, const char *plugin_path,
                                          const char *plugin_args, double plugin_interval),
 		  WRAP4(HASTUR_STRING_LABEL("name", name),
 			HASTUR_STRING_LABEL("plugin_path", plugin_path),
@@ -144,6 +136,37 @@ void *hastur_get_deliver_with_user_data(void) {
 void hastur_deliver_with(deliver_with_type callback, void *user_data) {
   hastur_deliver_with_callback = callback;
   hastur_deliver_with_user_data = user_data;
+}
+
+static timestamp_with_type hastur_timestamp_with_callback = NULL;
+static void *hastur_timestamp_with_user_data = NULL;
+
+timestamp_with_type hastur_get_timestamp_with(void) {
+  return hastur_timestamp_with_callback;
+}
+
+void *hastur_get_timestamp_with_user_data(void) {
+  return hastur_timestamp_with_user_data;
+}
+
+void hastur_timestamp_with(timestamp_with_type callback, void *user_data) {
+  hastur_timestamp_with_callback = callback;
+  hastur_timestamp_with_user_data = user_data;
+}
+
+time_t hastur_timestamp(void) {
+  struct timeval tv;
+
+  if(hastur_timestamp_with_callback) {
+    time_t ret;
+
+    hastur_timestamp_with_callback(&ret, hastur_timestamp_with_user_data);
+    return ret;
+  }
+
+  gettimeofday(&tv, NULL);
+
+  return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
 static char *hastur_app_name = NULL;
