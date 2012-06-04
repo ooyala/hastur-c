@@ -25,9 +25,9 @@ char *string_builder_start(string_builder_t *builder) {
 }
 
 void string_builder_append(string_builder_t *builder, const char *str) {
-  int builder_length = builder->buf_len - (builder->buf_tail - builder->buf_start);
+  int remaining_length = builder->buf_len - (builder->buf_tail - builder->buf_start);
 
-  strncpy(builder->buf_tail, str, builder_length);
+  strncpy(builder->buf_tail, str, remaining_length);
 
   /* Update tail pointer */
   builder->buf_tail += strlen(str);
@@ -37,8 +37,8 @@ void string_builder_append(string_builder_t *builder, const char *str) {
 }
 
 void string_builder_append_chars(string_builder_t *builder, const char *str, int len) {
-  int builder_length = builder->buf_len - (builder->buf_tail - builder->buf_start);
-  int length = (len > builder_length) ? builder_length : len;
+  int remaining_length = builder->buf_len - (builder->buf_tail - builder->buf_start);
+  int length = (len > remaining_length) ? remaining_length : len;
 
   strncpy(builder->buf_tail, str, length);
 
