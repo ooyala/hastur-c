@@ -38,6 +38,13 @@ char *string_builder_start(string_builder_t *builder);
 void string_builder_append(string_builder_t *builder, const char *str);
 
 /**
+ * Append to the buffer, up to a maximum number of characters (or the
+ * remaining buffer length in the builder).  Time to append is linear
+ * in the specified string, not in the current buffer length.
+ */
+void string_builder_append_chars(string_builder_t *builder, const char *str, int len);
+
+/**
  * Append a single character to the buffer in constant time.
  */
 void string_builder_append_char(string_builder_t *builder, char c);
