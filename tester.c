@@ -96,7 +96,8 @@ int main(int argc, char **argv) {
 		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
 		       "\"labels\":{\"app\":\"tester\",\"pid\":-PID-,\"tid\":\"main\"}}", NULL);
 
-  hastur_counter_v("labeled.counter", 1, HASTUR_NOW, "mylabel1", HASTUR_INT, 7, "mylabel2", HASTUR_STRING, "bobo", NULL);
+  hastur_counter_v("labeled.counter", 1, HASTUR_NOW,
+		   "mylabel1", HASTUR_INT, 7, "mylabel2", HASTUR_STRING, "bobo", NULL);
   assert_message_equal("{\"type\":\"counter\","
 		       "\"name\":\"labeled.counter\","
 		       "\"value\":1,"
