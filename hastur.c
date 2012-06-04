@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 #include <pthread.h>
 
@@ -125,6 +126,8 @@ static pthread_t hastur_background_thread;
 static int hastur_background_thread_initialized = 0;
 static int hastur_started = 0;
 
+static pthread_mutex_t hastur_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 static int hastur_no_background_thread_set = 1;
 
 void hastur_no_background_thread(void) {
@@ -136,10 +139,63 @@ void hastur_no_background_thread(void) {
   hastur_no_background_thread_set = 1;
 }
 
+typedef struct scheduler_entry_struct {
+  int period;
+  periodic_call_type callback;
+  void *user_data;
+  struct scheduler_entry_struct *next;
+} scheduler_entry_t;
+
+scheduler_entry_t *hastur_scheduler_entries = NULL;
+
+/* Not really.  There's four periods.  But this is plenty big for expansion. */
+#define PERIODS 20
+
 /**
  * The background thread's top-level function.
  */
 static void *hastur_run_background_thread(void* user_data) {
+  scheduler_entry_t *index;
+  time_t last_run[PERIODS];
+
+  memset(last_run, 0, sizeof(time_t) * PERIODS);
+
+  while(1) {
+    int will_run[PERIODS];
+    time_t now;
+
+    now = time(0);  /* Don't use hastur_timestamp, it can be overridden! */
+
+    memset(will_run, 0, sizeof(int) * PERIODS);
+
+    pthread_mutex_lock(&hastur_mutex);
+    will_run[HASTUR_FIVE_SECONDS] = (now - last_run[HASTUR_FIVE_SECONDS]) >= 5;
+    will_run[HASTUR_MINUTE] = (now - last_run[HASTUR_MINUTE]) >= 60;
+    will_run[HASTUR_HOUR] = (now - last_run[HASTUR_HOUR]) >= 60 * 60;
+    will_run[HASTUR_DAY] = (now - last_run[HASTUR_DAY]) >= 60 * 60 * 24;
+
+    index = hastur_scheduler_entries;
+    while(index) {
+      if(will_run[index->period]) {
+	/* Run this item */
+	index->callback(index->user_data);
+      }
+
+      index = index->next;
+    }
+
+    if(will_run[HASTUR_FIVE_SECONDS])
+      last_run[HASTUR_FIVE_SECONDS] = now;
+    if(will_run[HASTUR_MINUTE])
+      last_run[HASTUR_MINUTE] = now;
+    if(will_run[HASTUR_HOUR])
+      last_run[HASTUR_HOUR] = now;
+    if(will_run[HASTUR_DAY])
+      last_run[HASTUR_DAY] = now;
+    pthread_mutex_unlock(&hastur_mutex);
+    sleep(1);
+  }
+
   return NULL;
 }
 
@@ -170,9 +226,22 @@ int hastur_start(void) {
 }
 
 int hastur_every(int period, periodic_call_type callback, void *user_data) {
+  scheduler_entry_t *entry;
+
   if(period < HASTUR_FIVE_SECONDS || period > HASTUR_DAY) {
     return -1;  /* Argument error */
   }
+
+  entry = malloc(sizeof(scheduler_entry_t));
+  entry->period = period;
+  entry->callback = callback;
+  entry->user_data = user_data;
+  entry->next = NULL;
+
+  pthread_mutex_lock(&hastur_mutex);
+  entry->next = hastur_scheduler_entries;
+  hastur_scheduler_entries = entry;
+  pthread_mutex_unlock(&hastur_mutex);
 
   return 0;
 }
