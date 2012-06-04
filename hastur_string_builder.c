@@ -39,11 +39,12 @@ void string_builder_append(string_builder_t *builder, const char *str) {
 void string_builder_append_chars(string_builder_t *builder, const char *str, int len) {
   int remaining_length = builder->buf_len - (builder->buf_tail - builder->buf_start);
   int length = (len > remaining_length) ? remaining_length : len;
+  int str_length = strlen(str);
 
   strncpy(builder->buf_tail, str, length);
 
   /* Update tail pointer */
-  builder->buf_tail += length;
+  builder->buf_tail += (length < str_length ? length : str_length);
   if(builder->buf_tail > builder->buf_start + builder->buf_len) {
     builder->buf_tail = builder->buf_start + builder->buf_len;
   }
