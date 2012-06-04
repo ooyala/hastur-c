@@ -172,6 +172,42 @@ int hastur_mark_v(const char *name, const char *value, time_t timestamp, ...);
 int hastur_mark_labelstr(const char *name, const char *value, time_t timestamp, const char *labels);
 
 /**
+ * Send an event with the given subject and data.  The event name is
+ * similar to other message names.  The subject is specific to the
+ * individual event sent.  The body is further data (stack trace,
+ * contributing statistics, error messages for human readers).  Attn
+ * lists to whose attention the event should be brought -- email
+ * addresses, team names, phone numbers or other identifying
+ * information.
+ */
+int hastur_event(const char *name, const char *subject, const char *body, const char **attn);
+
+/**
+ * Send an event with the given subject, data, timestamp and labels.
+ * The event name is similar to other message names.  The subject is
+ * specific to the individual event sent.  The body is further data
+ * (stack trace, contributing statistics, error messages for human
+ * readers).  Attn lists to whose attention the event should be
+ * brought -- email addresses, team names, phone numbers or other
+ * identifying information.  Labels are specified with the
+ * HASTUR_[TYPE]_LABEL macros followed by a trailing NULL.
+ */
+int hastur_event_v(const char *name, const char *subject, const char *body, const char **attn,
+		   time_t timestamp, ...);
+
+/**
+ * Send an event with the given subject, data, timestamp and labels.
+ * The event name is similar to other message names.  The subject is
+ * specific to the individual event sent.  The body is further data
+ * (stack trace, contributing statistics, error messages for human
+ * readers).  Attn lists to whose attention the event should be
+ * brought -- email addresses, team names, phone numbers or other
+ * identifying information.  Labels are specified as a JSON string.
+ */
+int hastur_event_labelstr(const char *name, const char *subject, const char *body, const char **attn,
+			  time_t timestamp, const char *labels);
+
+/**
  * Send a log with the given subject and data.  The JSON data is a
  * JSON object, given as a string.
  */
