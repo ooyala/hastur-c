@@ -22,7 +22,12 @@ How Do I Use It?
 
 Build this library and link your application against it.
 
-Add Hastur calls to your application, such as:
+You'll need to give Hastur an application name and start it:
+
+    hastur_set_app_name("foo_server");
+    hastur_start();
+
+Now you can add Hastur calls to your application, such as:
 
     hastur_counter("my.thing.to.count", 1);          # Add 1 to my.thing.to.count
     hastur_gauge("other.thing.foo_latency", 371.1);  # Record a latency of 371.1
@@ -35,7 +40,8 @@ install a local daemon and have a back-end collector for it to talk
 to.  See the hastur-server ruby gem for specifics.
 
 Hastur optionally allows you to send at regular intervals using
-hastur_every(), which will call a function from a background thread:
+hastur_every(), which will call a function from a background thread
+(via pthreads):
 
     static int total = 0;
 
@@ -43,7 +49,7 @@ hastur_every(), which will call a function from a background thread:
       hastur_gauge("total.counting.so.far", total);
     }
 
-    hastur_every("minute", send_back_stats);
+    hastur_every(HASTUR_MINUTE, send_back_stats);
 
     while(1) { sleep(1); total++; }
 
@@ -55,6 +61,19 @@ calling hastur_timestamp() at that time.  See "labels" below for more
 specifics about labeling messages.
 
 The Doxygen documentation (see below) has far more specifics.
+
+The Background Thread
+---------------------
+
+If you don't want a background thread, you can turn it off before
+hastur_start() is called:
+
+   hastur_no_background_thread();
+   hastur_start();
+
+You can call hastur_every() either before or after starting the
+background thread.  It will call your callback at approximately that
+interval, usually starting immediately on start_start().
 
 Is It Documented?
 -----------------
