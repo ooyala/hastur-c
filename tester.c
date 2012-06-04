@@ -115,7 +115,8 @@ int main(int argc, char **argv) {
   hastur_event("my.event", "OMG!  3175 foozles warbled!",
 	       "no body to love...", "bob,jim,555-1212");
 
-  assert_message_equal("{\"type\":\"event\",\"name\":\"my.event\","
+  assert_message_equal("{\"type\":\"event\","
+		       "\"name\":\"my.event\","
 		       "\"subject\":\"OMG!  3175 foozles warbled!\","
 		       "\"body\":\"no body to love...\","
 		       "\"attn\":[\"bob\",\"jim\",\"555-1212\"],"
@@ -123,6 +124,22 @@ int main(int argc, char **argv) {
 		       "\"labels\":{\"app\":\"tester\",\"pid\":-PID-,\"tid\":\"main\"}"
 		       "}", NULL);
 
+  hastur_event_v("single.attn.event", "OMG!  3175 foozles warbled!",
+		 "no body to love...", "555-1212", HASTUR_NOW,
+		 HASTUR_STRING_LABEL("label", "some_value"),
+		 HASTUR_STRING_LABEL("app", "also tester!"), NULL);
+
+  assert_message_equal("{\"type\":\"event\","
+		       "\"name\":\"single.attn.event\","
+		       "\"subject\":\"OMG!  3175 foozles warbled!\","
+		       "\"body\":\"no body to love...\","
+		       "\"attn\":[\"555-1212\"],"
+		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
+		       "\"labels\":{"
+		         "\"label\":\"some_value\",\"app\":\"also tester!\",\"pid\":-PID-,\"tid\":\"main\"}"
+		       "}", NULL);
+
+  fprintf(stderr, "\n\n");
   fprintf(stderr, "Total assertions: %d\n", total_assertions);
   fprintf(stderr, "Correct assertions: %d\n", total_assertions - failed_assertions);
   fprintf(stderr, "Failed assertions: %d\n", failed_assertions);
