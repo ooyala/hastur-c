@@ -65,17 +65,18 @@ extern "C" {
  * floating-point constants in C are already double, so you don't have
  * to typecast.
  */
-#define HASTUR_DOUBLE     5
+#define HASTUR_DOUBLE   5
 
 /**
  * These constants are passed to functions ending in _v as the types
  * in a label/type/value triple.
  *
- * String arrays are turned into JSON arrays of strings.  These aren't
- * generally needed for labels, but are used internally for events
- * and could be useful for other kinds of rendering in some cases.
+ * Comma-separated arrays are turned into JSON arrays of strings.
+ * These aren't generally needed for labels, but are used internally
+ * for events and could be useful for other kinds of rendering in some
+ * cases.
  */
-#define HASTUR_STR_ARRAY  6
+#define HASTUR_COMMA_SEPARATED_ARRAY  6
 
 /**
  * Declare a label of type string.
@@ -106,6 +107,12 @@ extern "C" {
  * Declare a label of type double.  Also usable for floats.
  */
 #define HASTUR_DOUBLE_LABEL(label, value) (label), HASTUR_DOUBLE, (double)(value)
+
+/**
+ * Declare a string label to be split on strings.
+ */
+#define HASTUR_COMMA_SEPARATED_LABEL(label, value) \
+  (label), HASTUR_COMMA_SEPARATED_ARRAY, (const char *)(value)
 
 /**
  * If HASTUR_NOW is passed as a timestamp, Hastur will instead query the current time.
@@ -178,9 +185,9 @@ int hastur_mark_labelstr(const char *name, const char *value, time_t timestamp, 
  * contributing statistics, error messages for human readers).  Attn
  * lists to whose attention the event should be brought -- email
  * addresses, team names, phone numbers or other identifying
- * information.
+ * information.  The attn list is a comma-separated string.
  */
-int hastur_event(const char *name, const char *subject, const char *body, const char **attn);
+int hastur_event(const char *name, const char *subject, const char *body, const char *attn);
 
 /**
  * Send an event with the given subject, data, timestamp and labels.
@@ -189,10 +196,11 @@ int hastur_event(const char *name, const char *subject, const char *body, const 
  * (stack trace, contributing statistics, error messages for human
  * readers).  Attn lists to whose attention the event should be
  * brought -- email addresses, team names, phone numbers or other
- * identifying information.  Labels are specified with the
- * HASTUR_[TYPE]_LABEL macros followed by a trailing NULL.
+ * identifying information.  The attn list is a comma-separated
+ * string.  Labels are specified with the HASTUR_[TYPE]_LABEL macros
+ * followed by a trailing NULL.
  */
-int hastur_event_v(const char *name, const char *subject, const char *body, const char **attn,
+int hastur_event_v(const char *name, const char *subject, const char *body, const char *attn,
 		   time_t timestamp, ...);
 
 /**
@@ -202,9 +210,10 @@ int hastur_event_v(const char *name, const char *subject, const char *body, cons
  * (stack trace, contributing statistics, error messages for human
  * readers).  Attn lists to whose attention the event should be
  * brought -- email addresses, team names, phone numbers or other
- * identifying information.  Labels are specified as a JSON string.
+ * identifying information.  The attn list is a comma-separated
+ * string.  Labels are specified as a JSON string.
  */
-int hastur_event_labelstr(const char *name, const char *subject, const char *body, const char **attn,
+int hastur_event_labelstr(const char *name, const char *subject, const char *body, const char *attn,
 			  time_t timestamp, const char *labels);
 
 /**

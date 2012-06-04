@@ -84,6 +84,13 @@ ALL_MESSAGE_FUNCS(mark, WRAP2(const char *name, const char *value),
 		  WRAP2(HASTUR_STRING_LABEL("name", name),
 			HASTUR_STRING_LABEL("value", value)));
 
+ALL_MESSAGE_FUNCS(event, WRAP4(const char *name, const char *subject, const char *body,
+			       const char *attn),
+		  WRAP4(HASTUR_STRING_LABEL("name", name),
+			HASTUR_STRING_LABEL("subject", subject),
+			HASTUR_STRING_LABEL("body", body),
+			HASTUR_COMMA_SEPARATED_LABEL("attn", attn)));
+
 ALL_MESSAGE_FUNCS(log, WRAP2(const char *subject, const char *json_data),
 		  WRAP2(HASTUR_STRING_LABEL("subject", subject),
 			HASTUR_STRING_LABEL("data", json_data)));

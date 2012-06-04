@@ -74,22 +74,40 @@ static void format_json_from_va_list(string_builder_t *builder, va_list argp) {
       string_builder_append(builder, sub_buf);
       break;
 
-    case HASTUR_STR_ARRAY: {
-      const char **array_pointer;
-      array_pointer = (const char **)va_arg(argp, const char **);
+    case HASTUR_COMMA_SEPARATED_ARRAY: {
+      const char *index;
+      const char *end_ptr;
+      int first = 1;
 
-      /* TODO(noah): Use string builder */
-      /* TODO(noah): Escape strings */
-      strcpy(sub_buf, "[\"");
+      value_str = va_arg(argp, const char *);
+      index = value_str;
+      end_ptr = value_str + strlen(value_str);
 
-      while(*array_pointer) {
-	strncat(sub_buf, *array_pointer, BUFLEN);
-	strncat(sub_buf, "\",\"", BUFLEN);
+      string_builder_append_char(builder, '[');
 
-	array_pointer++;
+      /* Convert from CSV to array */
+      while(index < end_ptr) {
+	const char *word = index;
+
+	if(first) {
+	  first = 0;
+	} else {
+	  string_builder_append_char(builder, ',');
+	}
+
+	index = strchr(index, ',');
+	if(!index) {
+	  /* Append final word */
+	  string_builder_append(builder, word);
+	  break;
+	}
+	string_builder_append_chars(builder, word, (index - word));
+
+	index++;  /* Advance past the comma */
       }
 
-      strncat(sub_buf, "\"]", BUFLEN);
+      string_builder_append_char(builder, ']');
+
       break;
     }
 
