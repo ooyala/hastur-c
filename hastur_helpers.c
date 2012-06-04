@@ -116,7 +116,7 @@ static void format_json_from_va_list(string_builder_t *builder, va_list argp) {
     }
 
     default:
-      fprintf(stderr, "Unrecognized value type %d!", value_type);
+      fprintf(stderr, "Unrecognized value type %d!\n", value_type);
       /* And continue... */
     }
   }
@@ -194,6 +194,15 @@ static const char *get_tid(void) {
 #define getpid _getpid
 #endif
 
+/* This is amply big enough for a decimalized long int */
+char pid_buf[32];
+
+/* By analogy with get_tid.  Also, note we convert to string. */
+static const char *get_pid(void) {
+  sprintf(pid_buf, "%ld", (long int)getpid());
+  return pid_buf;
+}
+
 char labels_buf[BUFLEN];
 
 const char *__hastur_default_labels(void) {
@@ -209,11 +218,83 @@ char label_buf[BUFLEN];
 
 const char *__hastur_generate_labels(va_list argp) {
   string_builder_t *builder;
+  va_list arg_copy;
+
+  int app_seen = 0;
+  int pid_seen = 0;
+  int tid_seen = 0;
+
+  int count = 0;
+
+  /* Copy the arg list so we can see if app, pid or tid is supplied */
+  va_copy(arg_copy, argp);
 
   builder = string_builder_new(label_buf, BUFLEN);
 
   string_builder_append_char(builder, '{');
   format_json_from_va_list(builder, argp);
+
+  /* Now iterate through arg_copy and look for labels */
+  while(1) {
+    const char *label;
+    int value_type;
+
+    label = va_arg(arg_copy, const char *);
+    if(!label) break;
+
+    count++; /* Update total count of labels */
+
+    if(!strncmp("app", label, 4)) {
+      app_seen = 1;
+    } else if(!strncmp("pid", label, 4)) {
+      pid_seen = 1;
+    } else if(!strncmp("tid", label, 4)) {
+      tid_seen = 1;
+    }
+
+    value_type = va_arg(arg_copy, int);
+    switch(value_type) {
+    case HASTUR_INT:
+      va_arg(arg_copy, int);
+      break;
+    case HASTUR_STR:
+    case HASTUR_COMMA_SEPARATED_ARRAY:
+    case HASTUR_BARE:
+      va_arg(arg_copy, const char *);
+      break;
+    case HASTUR_LONG:
+      va_arg(arg_copy, long);
+      break;
+    case HASTUR_DOUBLE:
+      va_arg(arg_copy, double);
+      break;
+    default:
+      fprintf(stderr, "Unrecognized Hastur type %d!\n", value_type);
+    }
+  }
+
+  va_end(arg_copy);
+
+  /* Now append any label(s) we haven't already seen */
+
+  if(count != 0) {
+    string_builder_append_char(builder, ',');
+  }
+  if(!app_seen) {
+    string_builder_append(builder, "\"app\":\"");
+    string_builder_append(builder, hastur_get_app_name());
+    string_builder_append_char(builder, '\"');
+  }
+  if(!pid_seen) {
+    string_builder_append(builder, ",\"pid\":");
+    string_builder_append(builder, get_pid());
+  }
+  if(!tid_seen) {
+    string_builder_append(builder, ",\"tid\":\"");
+    string_builder_append(builder, get_tid());
+    string_builder_append_char(builder, '\"');
+  }
+
   string_builder_append_char(builder, '}');
 
   return label_buf;
