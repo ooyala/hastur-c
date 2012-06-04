@@ -112,18 +112,16 @@ int main(int argc, char **argv) {
 		       "\"labels\":{\"mylabel1\":7,\"mylabel2\":\"bobo\",\"pid\":319,"
 		       "\"app\":\"tester\",\"tid\":\"main\"}}", NULL);
 
-  {
-    hastur_event("my.event", "OMG!  3175 foozles warbled!",
-		 "no body to love...", "bob,jim,555-1212");
+  hastur_event("my.event", "OMG!  3175 foozles warbled!",
+	       "no body to love...", "bob,jim,555-1212");
 
-    assert_message_equal("{\"type\":\"event\",\"name\":\"my.event\","
-			 "\"subject\":\"OMG!  3175 foozles warbled!\","
-			 "\"body\":\"no body to love...\","
-			 "\"attn\":[\"bob\",\"jim\",\"555-1212\"],"
-			 "\"timestamp\":" FAKE_NOW_TIME_STRING ","
-			 "\"labels\":{\"app\":\"tester\",\"pid\":-PID-,\"tid\":\"main\"}"
-			 "}", NULL);
-  }
+  assert_message_equal("{\"type\":\"event\",\"name\":\"my.event\","
+		       "\"subject\":\"OMG!  3175 foozles warbled!\","
+		       "\"body\":\"no body to love...\","
+		       "\"attn\":[\"bob\",\"jim\",\"555-1212\"],"
+		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
+		       "\"labels\":{\"app\":\"tester\",\"pid\":-PID-,\"tid\":\"main\"}"
+		       "}", NULL);
 
   fprintf(stderr, "Total assertions: %d\n", total_assertions);
   fprintf(stderr, "Correct assertions: %d\n", total_assertions - failed_assertions);
