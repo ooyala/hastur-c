@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <pthread.h>
+
 /* 64k is more than we can send in a single UDP datagram */
 #define BUFLEN (64 * 1024)
 

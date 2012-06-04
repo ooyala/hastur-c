@@ -4,6 +4,8 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include <pthread.h>
+
 #include "hastur.h"
 #include "hastur_helpers.h"
 
