@@ -87,19 +87,30 @@ int main(int argc, char **argv) {
 
   hastur_counter("my.counter", 7);
   assert_message_equal("{\"type\":\"counter\","
-		       "\"name\":\"my.counter\",\"value\":7,\"timestamp\":" FAKE_NOW_TIME_STRING ","
+		       "\"name\":\"my.counter\","
+		       "\"value\":7,"
+		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
 		       "\"labels\":{\"app\":\"tester\",\"pid\":-PID-,\"tid\":\"main\"}}", NULL);
 
   hastur_counter_v("labeled.counter", 1, HASTUR_NOW, "mylabel1", HASTUR_INT, 7, "mylabel2", HASTUR_STRING, "bobo", NULL);
   assert_message_equal("{\"type\":\"counter\","
-		       "\"name\":\"labeled.counter\",\"value\":1,\"timestamp\":" FAKE_NOW_TIME_STRING ","
+		       "\"name\":\"labeled.counter\","
+		       "\"value\":1,"
+		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
 		       "\"labels\":{\"mylabel1\":7,\"mylabel2\":\"bobo\","
 		       "\"app\":\"tester\",\"pid\":-PID-,\"tid\":\"main\"}}", NULL);
 
-  hastur_counter_v("labeled.counter.2", 1, HASTUR_NOW,
+  hastur_counter_v("labeled.counter.fake_pid", 1, HASTUR_NOW,
 		   HASTUR_INT_LABEL("mylabel1", 7),
 		   HASTUR_STRING_LABEL("mylabel2", "bobo"),
+		   HASTUR_INT_LABEL("pid", 319),
 		   NULL);
+  assert_message_equal("{\"type\":\"counter\","
+		       "\"name\":\"labeled.counter.fake_pid\","
+		       "\"value\":1,"
+		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
+		       "\"labels\":{\"mylabel1\":7,\"mylabel2\":\"bobo\",\"pid\":319,"
+		       "\"app\":\"tester\",\"tid\":\"main\"}}", NULL);
 
   {
     hastur_event("my.event", "OMG!  3175 foozles warbled!",
