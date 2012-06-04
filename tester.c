@@ -85,6 +85,10 @@ int main(int argc, char **argv) {
   hastur_timestamp_with(use_fake_timestamp, NULL);
   hastur_set_app_name("tester");
 
+  /* No process registration will be sent over UDP because we set deliver_with */
+  hastur_no_background_thread();
+  hastur_start();
+
   hastur_counter("my.counter", 7);
   assert_message_equal("{\"type\":\"counter\","
 		       "\"name\":\"my.counter\","

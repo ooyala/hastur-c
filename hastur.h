@@ -120,6 +120,20 @@ extern "C" {
 #define HASTUR_NOW 0
 
 /**
+ * If this function has been called, do not start a background thread
+ * when calling hastur_start().  Exit and die if a background thread has
+ * already been started.
+ */
+void hastur_no_background_thread(void);
+
+/**
+ * Start the Hastur client.  Send process registration.  Start a
+ * background thread unless specifically instructed not to via
+ * hastur_no_background_thread().
+ */
+int hastur_start(void);
+
+/**
  * Return a current timestamp in microseconds since the Unix epoch.
  */
 time_t hastur_timestamp(void);
@@ -315,20 +329,37 @@ int hastur_info_agent_labelstr(const char *tag, const char *json_data, time_t ti
  */
 #define hastur_heartbeat_labelstr hastur_hb_process_labelstr
 
+/** Period for hastur_every */
+#define HASTUR_FIVE_SECONDS  1
+
+/** Period for hastur_every */
+#define HASTUR_MINUTE        2
+
+/** Period for hastur_every */
+#define HASTUR_HOUR          3
+
+/** Period for hastur_every */
+#define HASTUR_DAY           4
+
+/**
+ * A function type for periodic calls.  User_data can be ignored
+ * if desired.
+ */
+typedef void (*periodic_call_type)(void *user_data);
+
+/**
+ * The given callback is scheduled to be called approximately each
+ * given period from a pthreads background thread.  It will be called
+ * with the given user_data.
+ */
+int hastur_every(int period, periodic_call_type callback, void *user_data);
+
 /**
  * A function type for delivering messages.  User_data can be ignored
  * if desired.  Message is the message to be delivered.  The function
  * should return 0 for success and less than 0 for failure.
  */
 typedef int (*deliver_with_type)(const char *message, void *user_data);
-
-/**
- * A function type for getting timestamps.  User_data can be ignored
- * if desired.  New_time is a pointer to the new timestamp as time_t.
- * The function should return 0 for success and less than 0 for
- * failure.
- */
-typedef int (*timestamp_with_type)(time_t *new_time, void *user_data);
 
 /**
  * Instruct Hastur to use the specified callback to deliver its
@@ -348,6 +379,14 @@ deliver_with_type hastur_get_deliver_with(void);
  * was specified.
  */
 void *hastur_get_deliver_with_user_data(void);
+
+/**
+ * A function type for getting timestamps.  User_data can be ignored
+ * if desired.  New_time is a pointer to the new timestamp as time_t.
+ * The function should return 0 for success and less than 0 for
+ * failure.
+ */
+typedef int (*timestamp_with_type)(time_t *new_time, void *user_data);
 
 /**
  * Instruct Hastur to use the specified callback to get new timestamps

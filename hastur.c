@@ -121,6 +121,62 @@ ALL_MESSAGE_FUNCS(hb_process, WRAP3(const char *name, double value, double timeo
 			HASTUR_DOUBLE_LABEL("value", value),
 			HASTUR_DOUBLE_LABEL("timeout", timeout)));
 
+static pthread_t hastur_background_thread;
+static int hastur_background_thread_initialized = 0;
+static int hastur_started = 0;
+
+static int hastur_no_background_thread_set = 1;
+
+void hastur_no_background_thread(void) {
+  if(hastur_background_thread_initialized) {
+    fprintf(stderr, "Background thread is already running and you called hastur_no_background_thread!\n");
+    exit(1);
+  }
+
+  hastur_no_background_thread_set = 1;
+}
+
+/**
+ * The background thread's top-level function.
+ */
+static void *hastur_run_background_thread(void* user_data) {
+  return NULL;
+}
+
+int hastur_start(void) {
+  const char *app_name = hastur_get_app_name();
+
+  if(!app_name)
+    app_name = "unregistered";
+
+  if(!hastur_no_background_thread_set && !hastur_background_thread_initialized) {
+    int status = pthread_create(&hastur_background_thread, NULL, hastur_run_background_thread, NULL);
+
+    if(status < 0) {
+      fprintf(stderr, "Error creating hastur background thread!\n");
+      exit(-1);
+    }
+
+    hastur_background_thread_initialized = 1;
+  }
+
+  if(!hastur_started) {
+    hastur_reg_process(app_name, "{}");
+
+    hastur_started = 1;
+  }
+
+  return 0;
+}
+
+int hastur_every(int period, periodic_call_type callback, void *user_data) {
+  if(period < HASTUR_FIVE_SECONDS || period > HASTUR_DAY) {
+    return -1;  /* Argument error */
+  }
+
+  return 0;
+}
+
 static int hastur_agent_port = 8150;
 
 int hastur_get_agent_port(void) {
