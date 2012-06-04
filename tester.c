@@ -139,6 +139,18 @@ int main(int argc, char **argv) {
 		         "\"label\":\"some_value\",\"app\":\"also tester!\",\"pid\":-PID-,\"tid\":\"main\"}"
 		       "}", NULL);
 
+  hastur_event("my.event", "OMG!  3175 foozles warbled!",
+	       "no body to love...", "");
+
+  assert_message_equal("{\"type\":\"event\","
+		       "\"name\":\"my.event\","
+		       "\"subject\":\"OMG!  3175 foozles warbled!\","
+		       "\"body\":\"no body to love...\","
+		       "\"attn\":[],"
+		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
+		       "\"labels\":{\"app\":\"tester\",\"pid\":-PID-,\"tid\":\"main\"}"
+		       "}", NULL);
+
   fprintf(stderr, "\n\n");
   fprintf(stderr, "Total assertions: %d\n", total_assertions);
   fprintf(stderr, "Correct assertions: %d\n", total_assertions - failed_assertions);
