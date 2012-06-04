@@ -34,8 +34,6 @@ int print_message(const char *message, void *user_data) {
 static char buf[BUFLEN];
 
 int copy_to_buf(const char *message, void *user_data) {
-  printf("Copying to buffer: %s\n", message);
-
   strncpy(buf, message, BUFLEN);
 
   return 0;
@@ -109,10 +107,11 @@ int main(int argc, char **argv) {
 
     assert_message_equal("{\"type\":\"event\",\"name\":\"my.event\","
 			 "\"subject\":\"OMG!  3175 foozles warbled!\","
-			 "\"body\":\"no body to love...\""
+			 "\"body\":\"no body to love...\","
 			 "\"attn\":[\"bob\",\"jim\",\"555-1212\"],"
 			 "\"timestamp\":" FAKE_NOW_TIME_STRING ","
-			 "\"labels\":{\"app\":tester,\"pid\":-PID-,\"tid\":\"main\"}", NULL);
+			 "\"labels\":{\"app\":\"tester\",\"pid\":-PID-,\"tid\":\"main\"}"
+			 "}", NULL);
   }
 
   fprintf(stderr, "Total assertions: %d\n", total_assertions);

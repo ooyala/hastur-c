@@ -98,10 +98,14 @@ static void format_json_from_va_list(string_builder_t *builder, va_list argp) {
 	index = strchr(index, ',');
 	if(!index) {
 	  /* Append final word */
+	  string_builder_append_char(builder, '\"');
 	  string_builder_append(builder, word);
+	  string_builder_append_char(builder, '\"');
 	  break;
 	}
+	string_builder_append_char(builder, '\"');
 	string_builder_append_chars(builder, word, (index - word));
+	string_builder_append_char(builder, '\"');
 
 	index++;  /* Advance past the comma */
       }
