@@ -1,7 +1,6 @@
 *.o
 libhastur.a
 tester
-tester.dSYM
 doc/*
 *.dSYM/*
 data_test
