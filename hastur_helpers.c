@@ -277,10 +277,11 @@ const char *__hastur_generate_labels(va_list argp) {
 
   /* Now append any label(s) we haven't already seen */
 
-  if(count != 0) {
-    string_builder_append_char(builder, ',');
-  }
   if(!app_seen) {
+    if(count != 0) {
+      string_builder_append_char(builder, ',');
+    }
+
     string_builder_append(builder, "\"app\":\"");
     string_builder_append(builder, hastur_get_app_name());
     string_builder_append_char(builder, '\"');
