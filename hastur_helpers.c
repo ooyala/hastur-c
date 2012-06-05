@@ -187,9 +187,38 @@ int __hastur_send(const char *message) {
   return 0;
 }
 
+static char hex_digits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+			       'A', 'B', 'C', 'D', 'E', 'F' };
+
+char tid_buf[64];
+static const char *buf_to_hex(const char *buf, int len) {
+  char *tid_index = tid_buf;
+  const char *buf_index = buf;
+
+  *tid_index = '\0';
+  while(len) {
+    *tid_index = hex_digits[(*buf_index & 0xF0) >> 4];
+    tid_index++;
+    *tid_index = hex_digits[*buf_index & 0x0F];
+    tid_index++;
+
+    len--;
+    buf_index++;
+  }
+
+  return tid_buf;
+}
+
+extern pthread_t __hastur_start_thread;
+
 static const char *get_tid(void) {
-  /* TODO: useful get_tid() */
-  return "main";
+  pthread_t cur = pthread_self();
+
+  if(pthread_equal(cur, __hastur_start_thread)) {
+    return "main";
+  }
+
+  return buf_to_hex((const char*)&cur, sizeof(pthread_t));
 }
 
 #ifdef WIN32

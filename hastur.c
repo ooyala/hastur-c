@@ -166,6 +166,7 @@ scheduler_entry_t *hastur_scheduler_entries = NULL;
  * The background thread's top-level function.
  */
 static void *hastur_run_background_thread(void* user_data) {
+  scheduler_entry_t *copied_table;
   scheduler_entry_t *index;
   time_t last_run[PERIODS];
 
@@ -174,6 +175,8 @@ static void *hastur_run_background_thread(void* user_data) {
   while(1) {
     int will_run[PERIODS];
     time_t now;
+    int num_entries = 0;
+    int i;
 
     now = time(0);  /* Don't use hastur_timestamp, it can be overridden! */
 
@@ -185,16 +188,34 @@ static void *hastur_run_background_thread(void* user_data) {
     will_run[HASTUR_HOUR] = (now - last_run[HASTUR_HOUR]) >= 60 * 60;
     will_run[HASTUR_DAY] = (now - last_run[HASTUR_DAY]) >= 60 * 60 * 24;
 
+    /* Find the number of entries */
     index = hastur_scheduler_entries;
+    while(index) { index = index->next; num_entries++; }
+
+    /* Allocate a table of that many entries */
+    copied_table = malloc(sizeof(scheduler_entry_t) * num_entries);
+
+    /* Copy the entries from the list into the table */
+    index = hastur_scheduler_entries;
+    i = 0;
+    while(index) { copied_table[i] = *index; index = index->next; i++; }
+
+    index = copied_table;
+    pthread_mutex_unlock(&hastur_mutex);
+
+    /* Now, *not* holding the mutex, run the due entries in the table */
     while(index) {
       if(will_run[index->period]) {
 	/* Run this item */
 	index->callback(index->user_data);
       }
 
-      index = index->next;
+      index++;
     }
 
+    free(copied_table);
+
+    pthread_mutex_lock(&hastur_mutex);
     if(will_run[HASTUR_FIVE_SECONDS])
       last_run[HASTUR_FIVE_SECONDS] = now;
     if(will_run[HASTUR_MINUTE])
