@@ -119,6 +119,23 @@ extern "C" {
  */
 #define HASTUR_NOW 0
 
+/* Process exit codes */
+
+/**
+ * This error occurs when the user misuses threads in a way that
+ * Hastur isn't okay with, usually by calling hastur_start() from a
+ * background thread or by calling hastur_no_background_thread() when
+ * one already exists.
+ */
+#define HASTUR_EXIT_THREAD_CONFIG     1
+
+/**
+ * This error means a thread operation has failed, often thread
+ * creation.
+ */
+#define HASTUR_EXIT_THREAD_ERROR      2
+
+
 /**
  * If this function has been called, do not start a background thread
  * when calling hastur_start().  Exit and die if a background thread has

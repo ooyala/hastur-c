@@ -95,9 +95,12 @@ it will exit with status code 2.
 '''
     Code   Reason
     -------------------------------------------
-     1     Thread initialization errors
+     1     Thread configuration errors
      2     Error creating thread
 '''
+
+The HASTUR_EXIT codes in hastur.h define these as symbols if you're
+checking from C or C++.
 
 Is It Documented?
 -----------------
