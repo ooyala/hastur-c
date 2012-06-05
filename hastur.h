@@ -413,10 +413,10 @@ deliver_with_type hastur_get_deliver_with(void);
 void *hastur_get_deliver_with_user_data(void);
 
 /**
- * A function type for getting timestamps.  User_data can be ignored
- * if desired.  New_time is a pointer to the new timestamp as time_t.
- * The function should return 0 for success and less than 0 for
- * failure.
+ * A function type for getting message timestamps.  User_data can be
+ * ignored if desired.  New_time is a pointer to the new timestamp as
+ * time_t.  The function should return 0 for success and less than 0
+ * for failure.
  */
 typedef int (*timestamp_with_type)(time_t *new_time, void *user_data);
 
@@ -438,6 +438,21 @@ timestamp_with_type hastur_get_timestamp_with(void);
  * was specified.
  */
 void *hastur_get_timestamp_with_user_data(void);
+
+/**
+ * A function type for getting test times for the background thread.
+ * User_data can be ignored if desired.  The function should return an
+ * object of type time_t.
+ */
+typedef time_t (*bg_time_with_type)(void *user_data);
+
+/**
+ * Instruct Hastur to use the specified callback to get new timestamps
+ * rather than using the current time.  The user_data parameter will
+ * be passed to the specified callback.  This is only for testing and
+ * should never be used in production.
+ */
+void hastur_bg_time_with(bg_time_with_type callback, void *user_data);
 
 /**
  * Set the local UDP port for the Hastur agent.  Default is 8150.

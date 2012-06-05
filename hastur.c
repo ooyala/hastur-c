@@ -162,6 +162,21 @@ scheduler_entry_t *hastur_scheduler_entries = NULL;
 /* Not really.  There's four periods.  But this is plenty big for expansion. */
 #define PERIODS 20
 
+static bg_time_with_type hastur_bg_time_with_callback;
+static void *hastur_bg_time_with_user_data;
+
+void hastur_bg_time_with(bg_time_with_type callback, void *user_data) {
+  hastur_bg_time_with_callback = callback;
+  hastur_bg_time_with_user_data = user_data;
+}
+
+static time_t hastur_bg_thread_time(void) {
+  if(!hastur_bg_time_with_callback)
+    return time(0);
+
+  return hastur_bg_time_with_callback(hastur_bg_time_with_user_data);
+}
+
 /**
  * The background thread's top-level function.
  */
@@ -178,7 +193,7 @@ static void *hastur_run_background_thread(void* user_data) {
     int num_entries = 0;
     int i;
 
-    now = time(0);  /* Don't use hastur_timestamp, it can be overridden! */
+    now = hastur_bg_thread_time();
 
     memset(will_run, 0, sizeof(int) * PERIODS);
 
