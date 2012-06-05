@@ -20,5 +20,7 @@ int main(int argc, char **argv) {
 		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
 		       "\"labels\":{\"app\":\"thread_tester\",\"pid\":-PID-,\"tid\":\"main\"}}", NULL);
 
+  print_assertion_messages();
+
   return 0;
 }

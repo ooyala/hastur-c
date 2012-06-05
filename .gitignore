@@ -4,3 +4,4 @@ tester
 doc/*
 *.dSYM/*
 data_test
+threaded_tester

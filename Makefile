@@ -1,6 +1,6 @@
 HASTUR_SOURCE=hastur.c hastur_helpers.c hastur_string_builder.c
 
-all: library tester data_test
+all: library tester data_test threaded_tester
 
 tester: tester.c test_helper.c $(HASTUR_SOURCE)
 	gcc -o tester -Wall -O2 -ggdb $^ -lpthread
