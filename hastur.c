@@ -125,6 +125,7 @@ ALL_MESSAGE_FUNCS(hb_process, WRAP3(const char *name, double value, double timeo
 static pthread_t hastur_background_thread;
 static int hastur_background_thread_initialized = 0;
 static int hastur_started = 0;
+static pthread_t hastur_start_thread;
 
 static pthread_mutex_t hastur_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -205,21 +206,29 @@ int hastur_start(void) {
   if(!app_name)
     app_name = "unregistered";
 
+  if(hastur_started) {
+    if(!pthread_equal(hastur_start_thread, pthread_self())) {
+      fprintf(stderr, "hastur_start called from two different threads!"
+	      "  Hastur_start must always be called from the main thread!");
+      exit(1);
+    }
+
+  } else {
+    hastur_reg_process(app_name, "{}");
+    hastur_start_thread = pthread_self();
+
+    hastur_started = 1;
+  }
+
   if(!hastur_no_background_thread_set && !hastur_background_thread_initialized) {
     int status = pthread_create(&hastur_background_thread, NULL, hastur_run_background_thread, NULL);
 
     if(status < 0) {
-      fprintf(stderr, "Error creating hastur background thread!\n");
-      exit(-1);
+      fprintf(stderr, "Error (%d) creating hastur background thread!\n", status);
+      exit(2);
     }
 
     hastur_background_thread_initialized = 1;
-  }
-
-  if(!hastur_started) {
-    hastur_reg_process(app_name, "{}");
-
-    hastur_started = 1;
   }
 
   return 0;

@@ -25,7 +25,7 @@ Build this library and link your application against it.
 You'll need to give Hastur an application name and start it:
 
     hastur_set_app_name("foo_server");
-    hastur_start();
+    hastur_start();  /* hastur_start() must be called from the main thread */
 
 Now you can add Hastur calls to your application, such as:
 
@@ -62,8 +62,8 @@ specifics about labeling messages.
 
 The Doxygen documentation (see below) has far more specifics.
 
-The Background Thread
----------------------
+Threads and The Background Thread
+---------------------------------
 
 If you don't want a background thread, you can turn it off before
 hastur_start() is called:
@@ -74,6 +74,30 @@ hastur_start() is called:
 You can call hastur_every() either before or after starting the
 background thread.  It will call your callback at approximately that
 interval, usually starting immediately on start_start().
+
+hastur_start() may be called multiple times -- for instance if a
+library and your app both use it.  But it must always be called from
+the main thread of execution.  It is an error to call hastur_start()
+and *then* call hastur_no_background_thread().  The thread was already
+started.
+
+Bombing Out
+-----------
+
+There are a few things that can cause the Hastur client to exit with
+an error.  If you call hastur_no_background_thread() after the first
+hastur_start() or call hastur_start() from non-main threads, Hastur
+will exit with status code 1.
+
+If Hastur gets an error from pthreads when creating the background thread,
+it will exit with status code 2.
+
+'''
+    Code   Reason
+    -------------------------------------------
+     1     Thread initialization errors
+     2     Error creating thread
+'''
 
 Is It Documented?
 -----------------
