@@ -10,9 +10,6 @@
 #include "hastur.h"
 #include "hastur_helpers.h"
 
-/* Return an error code meaning that JSON wasn't rendered correctly */
-#define JSON_ERROR (-1)
-
 /* Fake out the macro system so I can pass multiple underlying
    arguments through a single macro argument */
 #define WRAP1(a) a
@@ -40,7 +37,7 @@
                                  "timestamp", HASTUR_LONG, timestamp,               \
                                  "labels", HASTUR_BARE, __hastur_default_labels(),  \
                                  NULL);                                             \
-    return json ? __hastur_send(json) : JSON_ERROR;                                 \
+    return json ? __hastur_send(json) : HASTUR_JSON_ERROR;                          \
 }                                                                                   \
                                                                                     \
 int hastur_ ## msg_name ## _v(params, time_t timestamp, ...) {                      \
@@ -56,7 +53,7 @@ int hastur_ ## msg_name ## _v(params, time_t timestamp, ...) {                  
                                "timestamp", HASTUR_LONG, timestamp,                 \
                                "labels", HASTUR_BARE, labels,                       \
                                NULL);                                               \
-  return json ? __hastur_send(json) : JSON_ERROR;                                   \
+  return json ? __hastur_send(json) : HASTUR_JSON_ERROR;                            \
 }                                                                                   \
                                                                                     \
 int hastur_ ## msg_name ## _labelstr(params, time_t timestamp,                      \
@@ -68,7 +65,7 @@ int hastur_ ## msg_name ## _labelstr(params, time_t timestamp,                  
                                "timestamp", HASTUR_LONG, timestamp,                 \
                                "labels", HASTUR_BARE, labels,                       \
                                NULL);                                               \
-  return json ? __hastur_send(json) : JSON_ERROR;                                   \
+  return json ? __hastur_send(json) : HASTUR_JSON_ERROR;                            \
 }
 
 /* TODO: Event is separate */
@@ -238,7 +235,7 @@ int hastur_every(int period, periodic_call_type callback, void *user_data) {
   scheduler_entry_t *entry;
 
   if(period < HASTUR_FIVE_SECONDS || period > HASTUR_DAY) {
-    return -1;  /* Argument error */
+    return EINVAL;  /* Argument error */
   }
 
   entry = malloc(sizeof(scheduler_entry_t));

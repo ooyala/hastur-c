@@ -119,6 +119,20 @@ extern "C" {
  */
 #define HASTUR_NOW 0
 
+/**
+ * This error means that Hastur got an otherwise-unclassified error
+ * sending via UDP.  More information might have been printed to
+ * stderr.
+ */
+#define HASTUR_UDP_ERROR    -1
+
+/**
+ * This error means that Hastur got an otherwise-unclassified error
+ * creating serialized JSON.  More information might have been printed
+ * to stderr.
+ */
+#define HASTUR_JSON_ERROR    -2
+
 /* Process exit codes */
 
 /**
@@ -367,7 +381,8 @@ typedef void (*periodic_call_type)(void *user_data);
 /**
  * The given callback is scheduled to be called approximately each
  * given period from a pthreads background thread.  It will be called
- * with the given user_data.
+ * with the given user_data.  Hastur_every returns EINVAL if given
+ * an invalid period.
  */
 int hastur_every(int period, periodic_call_type callback, void *user_data);
 

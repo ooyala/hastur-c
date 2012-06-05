@@ -149,7 +149,7 @@ const char *__hastur_format_json(const char *message_type, ...) {
 static int send_error(const char *s)
 {
   perror(s);
-  return -1;
+  return HASTUR_UDP_ERROR;
 }
 
 int __hastur_send(const char *message) {
