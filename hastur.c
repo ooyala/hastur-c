@@ -134,7 +134,7 @@ static int hastur_no_background_thread_set = 1;
 void hastur_no_background_thread(void) {
   if(hastur_background_thread_initialized) {
     fprintf(stderr, "Background thread is already running and you called hastur_no_background_thread!\n");
-    exit(1);
+    exit(HASTUR_EXIT_THREAD_CONFIG);
   }
 
   hastur_no_background_thread_set = 1;
@@ -210,7 +210,7 @@ int hastur_start(void) {
     if(!pthread_equal(hastur_start_thread, pthread_self())) {
       fprintf(stderr, "hastur_start called from two different threads!"
 	      "  Hastur_start must always be called from the main thread!");
-      exit(1);
+      exit(HASTUR_EXIT_THREAD_CONFIG);
     }
 
   } else {
@@ -225,7 +225,7 @@ int hastur_start(void) {
 
     if(status < 0) {
       fprintf(stderr, "Error (%d) creating hastur background thread!\n", status);
-      exit(2);
+      exit(HASTUR_EXIT_THREAD_ERROR);
     }
 
     hastur_background_thread_initialized = 1;
