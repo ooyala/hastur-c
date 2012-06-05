@@ -110,9 +110,8 @@ ALL_MESSAGE_FUNCS(log, WRAP2(const char *subject, const char *json_data),
 		  WRAP2(HASTUR_STRING_LABEL("subject", subject),
 			HASTUR_STRING_LABEL("data", json_data)));
 
-ALL_MESSAGE_FUNCS(reg_process, WRAP2(const char *name, const char *json_data),
-		  WRAP2(HASTUR_STRING_LABEL("name", name),
-			HASTUR_STRING_LABEL("data", json_data)));
+ALL_MESSAGE_FUNCS(reg_process, WRAP1(const char *json_data),
+		  WRAP1(HASTUR_BARE_LABEL("data", json_data)));
 
 ALL_MESSAGE_FUNCS(info_process, WRAP2(const char *tag, const char *json_data),
 		  WRAP2(HASTUR_STRING_LABEL("tag", tag),
@@ -260,7 +259,7 @@ int hastur_start(void) {
     }
 
   } else {
-    hastur_reg_process(app_name, "{}");
+    hastur_reg_process("{}");
     __hastur_start_thread = pthread_self();
 
     hastur_started = 1;

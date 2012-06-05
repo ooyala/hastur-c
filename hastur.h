@@ -286,7 +286,7 @@ int hastur_log_labelstr(const char *subject, const char *json_data, time_t times
  * Send a process registration with the given tag and data.  The JSON
  * data is a JSON object, given as a string.
  */
-int hastur_reg_process(const char *tag, const char *json_data);
+int hastur_reg_process(const char *json_data);
 
 /**
  * Send a process registration with the given tag, data and timestamp,
@@ -294,14 +294,14 @@ int hastur_reg_process(const char *tag, const char *json_data);
  * HASTUR_[TYPE]_LABEL macros followed by a trailing NULL.  The JSON
  * data is a JSON object, given as a string.
  */
-int hastur_reg_process_v(const char *tag, const char *json_data, time_t timestamp, ...);
+int hastur_reg_process_v(const char *json_data, time_t timestamp, ...);
 
 /**
  * Send a process registration with the given tag, data and timestamp,
  * and the specified labels.  Labels are specified as a JSON string.
  * The JSON data is a JSON object, given as a string.
  */
-int hastur_reg_process_labelstr(const char *tag, const char *json_data, time_t timestamp, const char *labels);
+int hastur_reg_process_labelstr(const char *json_data, time_t timestamp, const char *labels);
 
 /**
  * Send process information with the given tag and data.  The JSON
