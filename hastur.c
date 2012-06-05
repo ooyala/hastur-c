@@ -4,11 +4,14 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <errno.h>  /* For EINVAL */
 
 #include <pthread.h>
 
 #include "hastur.h"
 #include "hastur_helpers.h"
+
+static pthread_mutex_t hastur_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* Fake out the macro system so I can pass multiple underlying
    arguments through a single macro argument */
@@ -29,21 +32,27 @@
    difficult... */
 
 #define ALL_MESSAGE_FUNCS(msg_name, params, sent_params)                            \
-  int hastur_ ## msg_name ( params ) {                                              \
-    time_t timestamp = hastur_timestamp();                                          \
-    const char *json;                                                               \
-    json = __hastur_format_json( #msg_name ,                                        \
-                                 sent_params,                                       \
-                                 "timestamp", HASTUR_LONG, timestamp,               \
-                                 "labels", HASTUR_BARE, __hastur_default_labels(),  \
-                                 NULL);                                             \
-    return json ? __hastur_send(json) : HASTUR_JSON_ERROR;                          \
+int hastur_ ## msg_name ( params ) {                                                \
+  time_t timestamp = hastur_timestamp();                                            \
+  const char *json;                                                                 \
+  int ret_code = 0;                                                                 \
+  pthread_mutex_lock(&hastur_mutex);                                                \
+  json = __hastur_format_json( #msg_name ,                                          \
+                               sent_params,                                         \
+                               "timestamp", HASTUR_LONG, timestamp,                 \
+                               "labels", HASTUR_BARE, __hastur_default_labels(),    \
+                               NULL);                                               \
+  ret_code = json ? __hastur_send(json) : HASTUR_JSON_ERROR;                        \
+  pthread_mutex_unlock(&hastur_mutex);                                              \
+  return ret_code;                                                                  \
 }                                                                                   \
                                                                                     \
 int hastur_ ## msg_name ## _v(params, time_t timestamp, ...) {                      \
   const char *json;                                                                 \
   va_list argp;                                                                     \
   const char *labels;                                                               \
+  int ret_code = 0;                                                                 \
+  pthread_mutex_lock(&hastur_mutex);                                                \
   va_start(argp, timestamp);                                                        \
   labels = __hastur_generate_labels(argp);                                          \
   va_end(argp);                                                                     \
@@ -53,19 +62,25 @@ int hastur_ ## msg_name ## _v(params, time_t timestamp, ...) {                  
                                "timestamp", HASTUR_LONG, timestamp,                 \
                                "labels", HASTUR_BARE, labels,                       \
                                NULL);                                               \
-  return json ? __hastur_send(json) : HASTUR_JSON_ERROR;                            \
+  ret_code = json ? __hastur_send(json) : HASTUR_JSON_ERROR;                        \
+  pthread_mutex_unlock(&hastur_mutex);                                              \
+  return ret_code;                                                                  \
 }                                                                                   \
                                                                                     \
 int hastur_ ## msg_name ## _labelstr(params, time_t timestamp,                      \
                                      const char *labels) {                          \
   const char *json;                                                                 \
+  int ret_code = 0;                                                                 \
   if(timestamp == 0) { timestamp = hastur_timestamp(); }                            \
+  pthread_mutex_lock(&hastur_mutex);                                                \
   json = __hastur_format_json( #msg_name ,                                          \
                                sent_params,                                         \
                                "timestamp", HASTUR_LONG, timestamp,                 \
                                "labels", HASTUR_BARE, labels,                       \
                                NULL);                                               \
-  return json ? __hastur_send(json) : HASTUR_JSON_ERROR;                            \
+  ret_code = json ? __hastur_send(json) : HASTUR_JSON_ERROR;                        \
+  pthread_mutex_unlock(&hastur_mutex);                                              \
+  return ret_code;                                                                  \
 }
 
 /* TODO: Event is separate */
@@ -122,9 +137,7 @@ ALL_MESSAGE_FUNCS(hb_process, WRAP3(const char *name, double value, double timeo
 static pthread_t hastur_background_thread;
 static int hastur_background_thread_initialized = 0;
 static int hastur_started = 0;
-static pthread_t hastur_start_thread;
-
-static pthread_mutex_t hastur_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_t __hastur_start_thread;
 
 static int hastur_no_background_thread_set = 1;
 
@@ -204,7 +217,7 @@ int hastur_start(void) {
     app_name = "unregistered";
 
   if(hastur_started) {
-    if(!pthread_equal(hastur_start_thread, pthread_self())) {
+    if(!pthread_equal(__hastur_start_thread, pthread_self())) {
       fprintf(stderr, "hastur_start called from two different threads!"
 	      "  Hastur_start must always be called from the main thread!");
       exit(HASTUR_EXIT_THREAD_CONFIG);
@@ -212,7 +225,7 @@ int hastur_start(void) {
 
   } else {
     hastur_reg_process(app_name, "{}");
-    hastur_start_thread = pthread_self();
+    __hastur_start_thread = pthread_self();
 
     hastur_started = 1;
   }
