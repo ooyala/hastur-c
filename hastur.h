@@ -16,6 +16,7 @@ extern "C" {
  */
 
 #include <time.h>
+#include <pthread.h>
 
 /**
  * These constants are passed to functions ending in _v as the types in
@@ -440,21 +441,6 @@ timestamp_with_type hastur_get_timestamp_with(void);
 void *hastur_get_timestamp_with_user_data(void);
 
 /**
- * A function type for getting test times for the background thread.
- * User_data can be ignored if desired.  The function should return an
- * object of type time_t.
- */
-typedef time_t (*bg_time_with_type)(void *user_data);
-
-/**
- * Instruct Hastur to use the specified callback to get new timestamps
- * rather than using the current time.  The user_data parameter will
- * be passed to the specified callback.  This is only for testing and
- * should never be used in production.
- */
-void hastur_bg_time_with(bg_time_with_type callback, void *user_data);
-
-/**
  * Set the local UDP port for the Hastur agent.  Default is 8150.
  */
 int hastur_get_agent_port(void);
@@ -478,6 +464,35 @@ const char* hastur_get_app_name(void);
  * know.  There is no default.
  */
 void hastur_set_app_name(const char *app_name);
+
+/*****************************************************************
+ * TEST-ONLY APIs!
+ * DO NOT CALL ANY OF THE FOLLOWING APIs IN PRODUCTION!
+ *****************************************************************/
+
+/**
+ * A function type for getting test times for the background thread.
+ * User_data can be ignored if desired.  The function should return an
+ * object of type time_t.  This is only for testing and should never
+ * be used in production.
+ */
+typedef time_t (*bg_time_with_type)(void *user_data);
+
+/**
+ * Instruct Hastur to use the specified callback to get new timestamps
+ * rather than using the current time.  The user_data parameter will
+ * be passed to the specified callback.  This is only for testing and
+ * should never be used in production.
+ */
+void hastur_bg_time_with(bg_time_with_type callback, void *user_data);
+
+/**
+ * Retrieve the ID of the background thread.  Useful for assertions to
+ * make sure what thread a given message comes from, and potentially
+ * even to stop or kill the thread for crash-testing.  This is only
+ * for testing and should never be used in production.
+ */
+pthread_t hastur_get_bg_thread_id(void);
 
 #ifdef __cplusplus
 }
