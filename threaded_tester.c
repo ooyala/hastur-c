@@ -12,7 +12,7 @@ time_t time_plus_n(void *user_data) {
 }
 
 int main(int argc, char **argv) {
-  hastur_deliver_with(copy_to_buf, NULL);
+  hastur_deliver_with(copy_to_message_buf, NULL);
   hastur_timestamp_with(use_fake_timestamp, NULL);
   hastur_set_app_name("thread_tester");
 
@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
   assert_message_equal("{\"type\":\"reg_process\","
 		       "\"data\":{},"
 		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
-		       "\"labels\":{\"app\":\"thread_tester\",\"pid\":-PID-,\"tid\":\"main\"}}", NULL);
+		       "\"labels\":{\"app\":\"thread_tester\",\"pid\":-PID-,\"tid\":\"-BG-TID-\"}}", NULL);
 
   hastur_counter("my.counter", 7);
   assert_message_equal("{\"type\":\"counter\","

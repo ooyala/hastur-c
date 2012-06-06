@@ -8,7 +8,7 @@
 /* Main */
 
 int main(int argc, char **argv) {
-  hastur_deliver_with(copy_to_buf, NULL);
+  hastur_deliver_with(copy_to_message_buf, NULL);
   hastur_timestamp_with(use_fake_timestamp, NULL);
   hastur_set_app_name("tester");
 
