@@ -11,6 +11,7 @@ int __hastur_send(const char *message);
 const char *__hastur_format_json(const char *message_type, ...);
 const char *__hastur_default_labels(void);
 const char *__hastur_generate_labels(va_list argp);
+const char *__hastur_buf_to_hex(const char *buf, int len);
 
 #ifdef __cplusplus
 }

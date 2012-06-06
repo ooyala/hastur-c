@@ -190,8 +190,8 @@ int __hastur_send(const char *message) {
 static char hex_digits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 			       'A', 'B', 'C', 'D', 'E', 'F' };
 
-char tid_buf[64];
-static const char *buf_to_hex(const char *buf, int len) {
+static char tid_buf[64];
+const char *__hastur_buf_to_hex(const char *buf, int len) {
   char *tid_index = tid_buf;
   const char *buf_index = buf;
 
@@ -218,7 +218,7 @@ static const char *get_tid(void) {
     return "main";
   }
 
-  return buf_to_hex((const char*)&cur, sizeof(pthread_t));
+  return __hastur_buf_to_hex((const char*)&cur, sizeof(pthread_t));
 }
 
 #ifdef WIN32

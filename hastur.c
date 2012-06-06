@@ -142,7 +142,7 @@ pthread_t hastur_get_bg_thread_id(void) {
   return hastur_background_thread;
 }
 
-static int hastur_no_background_thread_set = 1;
+static int hastur_no_background_thread_set = 0;
 
 void hastur_no_background_thread(void) {
   if(hastur_background_thread_initialized) {
