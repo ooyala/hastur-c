@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
   hastur_set_app_name("thread_tester");
 
   expect_message("{\"type\":\"reg_process\","
-                 "\"data\":{},"
+                 "\"data\":{\"language\":\"c\",\"version\":\"0.0.1\"},"
                  "\"timestamp\":" FAKE_NOW_TIME_STRING ","
                  "\"labels\":{\"app\":\"thread_tester\",\"pid\":-PID-,\"tid\":\"main\"}}", NULL);
 

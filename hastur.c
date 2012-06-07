@@ -283,7 +283,7 @@ int hastur_start(void) {
 
   } else {
     __hastur_start_thread = pthread_self();
-    hastur_reg_process("{}");
+    hastur_reg_process("{\"language\":\"c\",\"version\":\"" HASTUR_VERSION "\"}");
 
     hastur_started = 1;
   }
