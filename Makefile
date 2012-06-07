@@ -17,4 +17,4 @@ data_test: data_test.c $(HASTUR_SOURCE)
 	gcc -o data_test $(OPTS) data_test.c $(HASTUR_SOURCE) -lpthread
 
 library: $(HASTUR_SOURCE:.c=.o)
-	libtool -static $(HASTUR_SOURCE:.c=.o) -o libhastur.a
+	ar rcs libhastur.a $(HASTUR_SOURCE:.c=.o)
