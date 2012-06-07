@@ -139,7 +139,9 @@ static int hastur_started = 0;
 pthread_t __hastur_start_thread;
 
 pthread_t hastur_get_bg_thread_id(void) {
-  return hastur_background_thread;
+  if(hastur_background_thread_initialized)
+    return hastur_background_thread;
+  return 0;
 }
 
 static int hastur_no_background_thread_set = 0;
@@ -201,10 +203,10 @@ static void *hastur_run_background_thread(void* user_data) {
     memset(will_run, 0, sizeof(int) * PERIODS);
 
     pthread_mutex_lock(&hastur_mutex);
-    will_run[HASTUR_FIVE_SECONDS] = (now - last_run[HASTUR_FIVE_SECONDS]) >= 5;
-    will_run[HASTUR_MINUTE] = (now - last_run[HASTUR_MINUTE]) >= 60;
-    will_run[HASTUR_HOUR] = (now - last_run[HASTUR_HOUR]) >= 60 * 60;
-    will_run[HASTUR_DAY] = (now - last_run[HASTUR_DAY]) >= 60 * 60 * 24;
+    will_run[HASTUR_FIVE_SECONDS] = ((now - last_run[HASTUR_FIVE_SECONDS]) >= 5);
+    will_run[HASTUR_MINUTE] = ((now - last_run[HASTUR_MINUTE]) >= 60);
+    will_run[HASTUR_HOUR] = ((now - last_run[HASTUR_HOUR]) >= 60 * 60);
+    will_run[HASTUR_DAY] = ((now - last_run[HASTUR_DAY]) >= 60 * 60 * 24);
 
     /* Find the number of entries */
     index = hastur_scheduler_entries;
@@ -222,7 +224,7 @@ static void *hastur_run_background_thread(void* user_data) {
     pthread_mutex_unlock(&hastur_mutex);
 
     /* Now, *not* holding the mutex, run the due entries in the table */
-    while(index) {
+    for(i = 0; i < num_entries; i++) {
       if(will_run[index->period]) {
 	/* Run this item */
 	index->callback(index->user_data);
@@ -243,6 +245,7 @@ static void *hastur_run_background_thread(void* user_data) {
     if(will_run[HASTUR_DAY])
       last_run[HASTUR_DAY] = now;
     pthread_mutex_unlock(&hastur_mutex);
+
     sleep(1);
   }
 
@@ -263,8 +266,8 @@ int hastur_start(void) {
     }
 
   } else {
-    hastur_reg_process("{}");
     __hastur_start_thread = pthread_self();
+    hastur_reg_process("{}");
 
     hastur_started = 1;
   }

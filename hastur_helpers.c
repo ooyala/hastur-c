@@ -206,6 +206,8 @@ const char *__hastur_buf_to_hex(const char *buf, int len) {
     buf_index++;
   }
 
+  *tid_index = '\0';
+
   return tid_buf;
 }
 

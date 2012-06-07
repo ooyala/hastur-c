@@ -75,6 +75,7 @@ int assert_message_equal(const char *expected_value, const char *message) {
   int pid = getpid();
   char pid_buf[20];  /* Big enough for any pid */
   pthread_t bg_tid;
+  const char *tid_buf;
   char *tmp;
   char *to_free = NULL;  /* malloc'd memory expecting later free */
   char *substituted;
@@ -89,8 +90,8 @@ int assert_message_equal(const char *expected_value, const char *message) {
   }
 
   bg_tid = hastur_get_bg_thread_id();
-  tmp = str_replace(substituted, "-BG-TID-",
-		    __hastur_buf_to_hex((const char *)&bg_tid, sizeof(pthread_t)));
+  tid_buf = __hastur_buf_to_hex((const char *)&bg_tid, sizeof(pthread_t));
+  tmp = str_replace(substituted, "-BG-TID-", tid_buf);
   if(tmp) {
     if(to_free) free(to_free);
     to_free = substituted;

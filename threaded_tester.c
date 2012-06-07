@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
   assert_message_equal("{\"type\":\"reg_process\","
 		       "\"data\":{},"
 		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
-		       "\"labels\":{\"app\":\"thread_tester\",\"pid\":-PID-,\"tid\":\"-BG-TID-\"}}", NULL);
+		       "\"labels\":{\"app\":\"thread_tester\",\"pid\":-PID-,\"tid\":\"main\"}}", NULL);
 
   hastur_counter("my.counter", 7);
   assert_message_equal("{\"type\":\"counter\","
