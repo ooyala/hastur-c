@@ -71,7 +71,7 @@ char *str_replace(const char *orig, const char *rep, const char *with) {
     return result;
 }
 
-int assert_message_equal(const char *expected_value, const char *message) {
+static char *substitute_message(const char *templated_message) {
   int pid = getpid();
   char pid_buf[20];  /* Big enough for any pid */
   pthread_t bg_tid;
@@ -81,12 +81,12 @@ int assert_message_equal(const char *expected_value, const char *message) {
   char *substituted;
 
   snprintf(pid_buf, 20, "%d", pid);
-  tmp = str_replace(expected_value, "-PID-", pid_buf);
+  tmp = str_replace(templated_message, "-PID-", pid_buf);
   if(tmp) {
     substituted = tmp;
     to_free = tmp;
   } else {
-    substituted = (char*)expected_value;
+    substituted = (char*)templated_message;
   }
 
   bg_tid = hastur_get_bg_thread_id();
@@ -100,7 +100,18 @@ int assert_message_equal(const char *expected_value, const char *message) {
     /* Keep "substituted" the same, along with "to_free" if any. */
   }
 
-  assert_equal(substituted, message_buf, message);
+  /* Nothing substituted?  Return NULL.  Otherwise return the new
+     version of the message. */
+  return (substituted == templated_message) ? NULL : substituted;
+}
+
+int assert_message_equal(const char *message_template, const char *assertion_message) {
+  char *expected_value = substitute_message(message_template);
+
+  assert_equal(expected_value ? expected_value : message_template, message_buf, assertion_message);
+
+  if(expected_value)
+    free(expected_value);
 
   return 0;
 }
