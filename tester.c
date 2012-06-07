@@ -16,6 +16,11 @@ int main(int argc, char **argv) {
   hastur_no_background_thread();
   hastur_start();
 
+  assert_message_equal("{\"type\":\"reg_process\","
+		       "\"data\":{},"
+		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
+		       "\"labels\":{\"app\":\"tester\",\"pid\":-PID-,\"tid\":\"main\"}}", NULL);
+
   hastur_counter("my.counter", 7);
   assert_message_equal("{\"type\":\"counter\","
 		       "\"name\":\"my.counter\","
