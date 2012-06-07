@@ -182,6 +182,10 @@ static time_t hastur_bg_thread_time(void) {
   return hastur_bg_time_with_callback(hastur_bg_time_with_user_data);
 }
 
+static void every_minute_heartbeat(void *user_data) {
+  hastur_hb_process("process_heartbeat", 0.0, 60.0);
+}
+
 /**
  * The background thread's top-level function.
  */
@@ -191,6 +195,8 @@ static void *hastur_run_background_thread(void* user_data) {
   time_t last_run[PERIODS];
 
   memset(last_run, 0, sizeof(time_t) * PERIODS);
+
+  hastur_every(HASTUR_MINUTE, every_minute_heartbeat, NULL);
 
   while(1) {
     int will_run[PERIODS];
@@ -213,7 +219,7 @@ static void *hastur_run_background_thread(void* user_data) {
     while(index) { index = index->next; num_entries++; }
 
     /* Allocate a table of that many entries */
-    copied_table = malloc(sizeof(scheduler_entry_t) * num_entries);
+    copied_table = num_entries > 0 ? malloc(sizeof(scheduler_entry_t) * num_entries) : NULL;
 
     /* Copy the entries from the list into the table */
     index = hastur_scheduler_entries;
@@ -233,7 +239,8 @@ static void *hastur_run_background_thread(void* user_data) {
       index++;
     }
 
-    free(copied_table);
+    if(copied_table)
+      free(copied_table);
 
     pthread_mutex_lock(&hastur_mutex);
     if(will_run[HASTUR_FIVE_SECONDS])
