@@ -225,6 +225,27 @@ int hastur_mark_v(const char *name, const char *value, time_t timestamp, ...);
 int hastur_mark_labelstr(const char *name, const char *value, time_t timestamp, const char *labels);
 
 /**
+ * Send a process heartbeat with the given name, value and timeout in
+ * fractional seconds.
+ */
+int hastur_hb_process(const char *name, double value, double timeout);
+
+/**
+ * Send a process heartbeat with the given name, value, timeout in
+ * fractional seconds and Hastur timestamp, with the specified labels.
+ * Labels are specified with the HASTUR_[TYPE]_LABEL macros followed
+ * by a trailing NULL.
+ */
+int hastur_hb_process_v(const char *name, double value, double timeout, time_t timestamp, ...);
+
+/**
+ * Send a process heartbeat with the given name, value, timeout in
+ * fractional seconds and Hastur timestamp, with the specified labels.
+ * Labels are specified as a JSON string.
+ */
+int hastur_hb_process_labelstr(const char *name, double value, double timeout, time_t timestamp, const char *labels);
+
+/**
  * Send an event with the given subject and data.  The event name is
  * similar to other message names.  The subject is specific to the
  * individual event sent.  The body is further data (stack trace,
