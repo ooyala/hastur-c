@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
   hastur_start();
 
   assert_message_equal("{\"type\":\"reg_process\","
-		       "\"data\":{},"
+		       "\"data\":{\"language\":\"c\",\"version\":\"0.0.1\"},"
 		       "\"timestamp\":" FAKE_NOW_TIME_STRING ","
 		       "\"labels\":{\"app\":\"tester\",\"pid\":-PID-,\"tid\":\"main\"}}", NULL);
 
