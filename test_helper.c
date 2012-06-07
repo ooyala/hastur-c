@@ -214,3 +214,7 @@ void print_assertion_messages(void) {
   fprintf(stderr, "Correct assertions: %d\n", total_assertions - failed_assertions);
   fprintf(stderr, "Failed assertions: %d\n", failed_assertions);
 }
+
+int assertion_success(void) {
+  return (failed_assertions > 0) ? -1 : 0;
+}

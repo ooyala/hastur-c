@@ -90,5 +90,5 @@ int main(int argc, char **argv) {
 
   print_assertion_messages();
 
-  return 0;
+  return assertion_success();
 }
