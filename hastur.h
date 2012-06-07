@@ -18,6 +18,8 @@ extern "C" {
 #include <time.h>
 #include <pthread.h>
 
+#define HASTUR_VERSION "0.0.1"
+
 /**
  * These constants are passed to functions ending in _v as the types in
  * a label/type/value triple.
