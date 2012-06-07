@@ -4,6 +4,9 @@ OPTS = -Wall -ggdb
 
 all: library tester data_test threaded_tester
 
+clean:
+	rm -f tester data_test threaded_tester libhastur.a
+
 tester: tester.c test_helper.c $(HASTUR_SOURCE)
 	gcc -o tester $(OPTS) $^ -lpthread
 
