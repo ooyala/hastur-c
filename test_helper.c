@@ -116,6 +116,84 @@ int assert_message_equal(const char *message_template, const char *assertion_mes
   return 0;
 }
 
+typedef struct expectation_struct {
+  char *message;
+  const char *assertion_message;
+  struct expectation_struct *next;
+} expectation_t;
+
+static expectation_t *expectation_list = NULL;
+
+int expect_message(const char *message_template, const char *assertion_message) {
+  expectation_t *exp;
+  char *expected_value = substitute_message(message_template);
+
+  exp = malloc(sizeof(expectation_t));
+
+  /* Need an allocated value so we can just blindly call free() on them later. */
+  if(expected_value) {
+    exp->message = expected_value;
+  } else {
+    /* If nothing new was allocated, strdup the template */
+    exp->message = strdup(message_template);
+  }
+
+  exp->assertion_message = assertion_message;
+  exp->next = expectation_list;
+
+  expectation_list = exp;
+
+  return 0;
+}
+
+int check_message_expectation(const char *message, void *user_data) {
+  expectation_t *prev = NULL;
+  expectation_t *index = expectation_list;
+
+  while(index) {
+    if(!strcmp(message, index->message)) {
+      /* Found a match! */
+      assert_equal(message, index->message, index->assertion_message);
+
+      /* Delete it from the list */
+      if(index == expectation_list) {
+	expectation_list = expectation_list->next;
+      } else {
+	prev->next = index->next;
+      }
+
+      free(index->message);
+      free(index);
+      return 0;
+    }
+    prev = index;
+    index = index->next;
+  }
+
+  fprintf(stderr, "Unexpected message:\n%s\n", message);
+  return 0;
+}
+
+int satisfied_expectations(void) {
+  expectation_t *index = expectation_list;
+  while(index) {
+    /* Skip to next element */
+    expectation_list = expectation_list->next;
+
+    fprintf(stderr, "Unsatisfied expectation, message:\n%s\n",
+	    index->message);
+    assert_equal(index->message, "", index->assertion_message);
+
+    /* Free the element */
+    free(index->message);
+    free(index);
+
+    index = expectation_list;
+  }
+
+  return 0;
+}
+
 int assert_equal(const char *expected, const char *actual, const char *message) {
   total_assertions++;
 
