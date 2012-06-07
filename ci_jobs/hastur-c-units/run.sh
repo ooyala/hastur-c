@@ -10,6 +10,8 @@ else
   export PROJECT_DIR=$WORKSPACE/hastur-c;
 fi
 
+cd $PROJECT_DIR/hastur-c
+
 make clean
 make
 
