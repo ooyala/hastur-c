@@ -25,6 +25,12 @@ int main(int argc, char **argv) {
                  "\"data\":{},"
                  "\"timestamp\":" FAKE_NOW_TIME_STRING ","
                  "\"labels\":{\"app\":\"thread_tester\",\"pid\":-PID-,\"tid\":\"main\"}}", NULL);
+
+  /* Delay 2 seconds before background thread starts */
+  hastur_delay_bg_thread_start(2);
+  hastur_start();
+
+  /* BG thread is delaying, but exists so we can use "-BG-TID-" successfully. */
   expect_message("{\"type\":\"hb_process\","
 		 "\"name\":\"process_heartbeat\","
 		 "\"value\":0,"
@@ -32,8 +38,7 @@ int main(int argc, char **argv) {
 		 "\"timestamp\":" FAKE_NOW_TIME_STRING ","
 		 "\"labels\":{\"app\":\"thread_tester\",\"pid\":-PID-,\"tid\":\"-BG-TID-\"}}", NULL);
 
-  hastur_start();
-  sleep(2);  /* Let them both happen */
+  sleep(4);  /* Let them both happen */
   satisfied_expectations();
 
   /* Now stop using expectations and check directly */

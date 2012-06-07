@@ -182,6 +182,12 @@ static time_t hastur_bg_thread_time(void) {
   return hastur_bg_time_with_callback(hastur_bg_time_with_user_data);
 }
 
+static int seconds_to_delay_bg = 0;
+
+void hastur_delay_bg_thread_start(int seconds) {
+  seconds_to_delay_bg = seconds;
+}
+
 static void every_minute_heartbeat(void *user_data) {
   hastur_hb_process("process_heartbeat", 0.0, 60.0);
 }
@@ -197,6 +203,9 @@ static void *hastur_run_background_thread(void* user_data) {
   memset(last_run, 0, sizeof(time_t) * PERIODS);
 
   hastur_every(HASTUR_MINUTE, every_minute_heartbeat, NULL);
+
+  if(seconds_to_delay_bg)
+    sleep(seconds_to_delay_bg);
 
   while(1) {
     int will_run[PERIODS];

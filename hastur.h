@@ -515,6 +515,13 @@ void hastur_bg_time_with(bg_time_with_type callback, void *user_data);
  */
 pthread_t hastur_get_bg_thread_id(void);
 
+/**
+ * Number of seconds to delay the background thread when it starts
+ * before it starts sending messages.  This is only for testing and
+ * should never be used in production.
+ */
+void hastur_delay_bg_thread_start(int seconds);
+
 #ifdef __cplusplus
 }
 #endif
