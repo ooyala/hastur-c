@@ -269,11 +269,6 @@ static void *hastur_run_background_thread(void* user_data) {
 }
 
 int hastur_start(void) {
-  const char *app_name = hastur_get_app_name();
-
-  if(!app_name)
-    app_name = "unregistered";
-
   if(hastur_started) {
     if(!pthread_equal(__hastur_start_thread, pthread_self())) {
       fprintf(stderr, "hastur_start called from two different threads!"
@@ -383,12 +378,27 @@ time_t hastur_timestamp(void) {
 static char *hastur_app_name = NULL;
 
 const char* hastur_get_app_name(void) {
-  return hastur_app_name;
+  const char *app_name_env = NULL;
+
+  if(hastur_app_name)
+    return hastur_app_name;
+
+  app_name_env = getenv("HASTUR_APP_NAME");
+  if(app_name_env) {
+    hastur_app_name = strdup(app_name_env);
+    return hastur_app_name;
+  }
+
+  return "unregistered";
 }
 
 void hastur_set_app_name(const char *app_name) {
   if(hastur_app_name) {
     free(hastur_app_name);
   }
-  hastur_app_name = strdup(app_name);
+  if(!app_name) {
+    hastur_app_name = NULL;
+  } else {
+    hastur_app_name = strdup(app_name);
+  }
 }

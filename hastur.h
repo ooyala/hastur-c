@@ -477,7 +477,8 @@ void hastur_set_agent_port(int port);
 /**
  * Get the application name, if any, that Hastur tags messages with.
  * Frequently argv[0] is a good value for this if you don't otherwise
- * know.  No default.
+ * know.  This defaults to the environment variable 'HASTUR_APP_NAME',
+ * if present.
  */
 const char* hastur_get_app_name(void);
 
