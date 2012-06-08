@@ -76,11 +76,13 @@ int main(int argc, char **argv) {
 		         "\"label\":\"some_value\",\"app\":\"also tester!\",\"pid\":-PID-,\"tid\":\"main\"}"
 		       "}", NULL);
 
+  hastur_set_message_name_prefix("ots.team.");
   hastur_event("my.event", "OMG!  3175 foozles warbled!",
 	       "no body to love...", "");
+  hastur_set_message_name_prefix(NULL);
 
   assert_message_equal("{\"type\":\"event\","
-		       "\"name\":\"my.event\","
+		       "\"name\":\"ots.team.my.event\","
 		       "\"subject\":\"OMG!  3175 foozles warbled!\","
 		       "\"body\":\"no body to love...\","
 		       "\"attn\":[],"

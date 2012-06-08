@@ -53,6 +53,14 @@ static void format_json_from_va_list(string_builder_t *builder, va_list argp) {
       string_builder_append(builder, "\"");
       break;
 
+    case HASTUR_NAME:
+      value_str = va_arg(argp, const char *);
+      string_builder_append(builder, "\"");
+      string_builder_append(builder, hastur_get_message_name_prefix());
+      string_builder_append(builder, value_str);  /* TODO: escape string */
+      string_builder_append(builder, "\"");
+      break;
+
     case HASTUR_BARE:
       value_str = va_arg(argp, const char *);
       string_builder_append(builder, value_str);

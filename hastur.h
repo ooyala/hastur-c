@@ -82,6 +82,15 @@ extern "C" {
 #define HASTUR_COMMA_SEPARATED_ARRAY  6
 
 /**
+ * These constants are passed to functions ending in _v as the types
+ * in a label/type/value triple.
+ *
+ * Names are like regular strings, but Hastur should prefix them with
+ * the current message-name prefix, if one is set.
+ */
+#define HASTUR_NAME   7
+
+/**
  * Declare a label of type string.
  */
 #define HASTUR_STR_LABEL(label, value) (label), HASTUR_STRING, (const char *)(value)
@@ -116,6 +125,12 @@ extern "C" {
  */
 #define HASTUR_COMMA_SEPARATED_LABEL(label, value) \
   (label), HASTUR_COMMA_SEPARATED_ARRAY, (const char *)(value)
+
+/**
+ * Declare a label of type name, which should be prefixed with the
+ * current message name prefix if one is set.
+ */
+#define HASTUR_NAME_LABEL(label, value) (label), HASTUR_NAME, (const char *)(value)
 
 /**
  * If HASTUR_NOW is passed as a timestamp, Hastur will instead query the current time.
@@ -485,9 +500,22 @@ const char* hastur_get_app_name(void);
 /**
  * Set the application name that Hastur tags messages with.
  * Frequently argv[0] is a good value for this if you don't otherwise
- * know.  There is no default.
+ * know.
  */
 void hastur_set_app_name(const char *app_name);
+
+/**
+ * Get the prefix that Hastur prefixes all message names with, if the
+ * message type has a name.  Defaults to the empty string.
+ */
+const char *hastur_get_message_name_prefix(void);
+
+/**
+ * Set the prefix that Hastur prefixes all message names with, if the
+ * message type has a name.  Defaults to the empty string.  A NULL
+ * value will be treated as the empty string.
+ */
+void hastur_set_message_name_prefix(const char *prefix);
 
 /*****************************************************************
  * TEST-ONLY APIs!
