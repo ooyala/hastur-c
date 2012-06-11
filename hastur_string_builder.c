@@ -12,10 +12,15 @@
 string_builder_t *string_builder_new(char *buf, int len) {
   string_builder_t *ret;
 
+  /* How will we handle final NUL-termination?  Stick a NUL on the end
+     and instruct the string builder to never use that byte.  Hey
+     presto, guaranteed no overflow. */
+  buf[len - 1] = '\0';
+
   ret = malloc(sizeof(string_builder_t));
   ret->buf_start = buf;
   ret->buf_tail = buf;
-  ret->buf_len = len;
+  ret->buf_len = len - 1;
 
   return ret;
 }
